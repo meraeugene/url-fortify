@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { AnalysisStatisticsCard } from "./AnalysisStatisticsCard";
 import { CategoriesCard } from "./CategoriesCard";
 import AnalysisResultsCard from "./AnalysisResultsCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import useUrlAnalysis from "@/hooks/useUrlAnalysis";
 
 export function Analysis({
   screenshot,
@@ -27,6 +29,8 @@ export function Analysis({
       sortOrder.indexOf(resultA.result) - sortOrder.indexOf(resultB.result)
   );
 
+  const { screenshotLoading } = useUrlAnalysis();
+
   const data = [
     {
       title: "Safety Snapshot",
@@ -38,13 +42,17 @@ export function Analysis({
             threats.
           </p>
           <div>
-            <Image
-              src={screenshot || ""}
-              alt="website screenshot"
-              width={500}
-              height={500}
-              className="rounded-lg object-cover w-full"
-            />
+            {screenshotLoading ? (
+              <Skeleton className="w-full h-screen rounded-lg" />
+            ) : (
+              <Image
+                src={screenshot || ""}
+                alt="website screenshot"
+                width={500}
+                height={500}
+                className="rounded-lg object-cover w-full"
+              />
+            )}
           </div>
         </div>
       ),
@@ -101,6 +109,9 @@ export function Analysis({
           </div>
         </div>
       ),
+    },
+    {
+      title: "Fortified",
     },
   ];
 

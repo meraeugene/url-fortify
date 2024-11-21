@@ -6,6 +6,7 @@ import { AnalysisData } from "@/types";
 
 const useUrlAnalysis = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [screenshotLoading, setScreenshotLoading] = useState<boolean>(true); // for screenshot fetching
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
 
   const getDomain = (url: string): string => {
@@ -49,9 +50,11 @@ const useUrlAnalysis = () => {
       //   { headers: { "Content-Type": "application/json" } }
       // );
 
+      setScreenshotLoading(true); // Set the screenshot loading state to true
       const { data: captureResponse } = await axios.get(
         `/api/proxy/capture?url=${encodeURIComponent(trimmedUrl)}`
       );
+      setScreenshotLoading(false); // Set the screenshot loading state to false when done
 
       const { screenshot } = captureResponse;
 
@@ -80,7 +83,7 @@ const useUrlAnalysis = () => {
     }
   };
 
-  return { analyzeUrl, analysisData, loading };
+  return { analyzeUrl, analysisData, loading, screenshotLoading };
 };
 
 export default useUrlAnalysis;

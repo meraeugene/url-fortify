@@ -18,6 +18,7 @@ const s3Client = new S3Client({
   },
 });
 
+// API FLASH
 export const GET = async (request: Request) => {
   try {
     const { searchParams } = new URL(request.url);
