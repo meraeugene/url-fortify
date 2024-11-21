@@ -13,6 +13,7 @@ const URLInput = () => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     analyzeUrl(url);
+    setUrl("");
   };
 
   return (

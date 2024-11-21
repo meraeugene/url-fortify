@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { S3Client } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
-import axios from "axios";
-import { base64EncodeUrl } from "@/helpers/urlUtils";
 
 const region = process.env.AWS_S3_REGION;
 const bucketName = process.env.AWS_S3_BUCKET_NAME;
@@ -18,7 +16,7 @@ const s3Client = new S3Client({
   },
 });
 
-// API FLASH
+// API FLASH - Screenshot Capture Route
 export const GET = async (request: Request) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -57,17 +55,22 @@ export const GET = async (request: Request) => {
     // Construct the full URL with parameters
     const urlWithParams = new URL(apiUrl);
 
+    // Append the parameters to the URL
     Object.keys(params).forEach((key) => {
       const value = params[key as keyof typeof params];
-      urlWithParams.searchParams.append(key, String(value)); // Ensure value is converted to string
+      urlWithParams.searchParams.append(key, String(value));
     });
 
-    // Log the full URL (optional)
-    console.log("Request URL with parameters:", urlWithParams.toString());
+    // Make the API request using fetch
+    const response = await fetch(urlWithParams.toString());
 
-    const response = await axios.get(apiUrl, { params });
+    if (!response.ok) {
+      throw new Error(`Error fetching screenshot: ${response.statusText}`);
+    }
 
-    return new NextResponse(JSON.stringify({ screenshot: response.data.url }), {
+    const data = await response.json();
+
+    return new NextResponse(JSON.stringify({ screenshot: data.url }), {
       status: 200,
     });
   } catch (error: any) {

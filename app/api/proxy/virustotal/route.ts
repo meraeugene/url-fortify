@@ -1,5 +1,4 @@
 import { base64EncodeUrl } from "@/helpers/urlUtils";
-import axios from "axios";
 import { NextResponse } from "next/server";
 
 export const GET = async (request: Request) => {
@@ -25,22 +24,31 @@ export const GET = async (request: Request) => {
       );
     }
 
-    // Set up the VirusTotal API request
-    const response = await axios.get(
-      `https://www.virustotal.com/api/v3/urls/${base64EncodeUrl(url)}`,
-      {
-        headers: {
-          accept: "application/json",
-          "x-apikey": process.env.VIRUS_TOTAL_API_KEY, // Set your API key in .env
-        },
-      }
-    );
+    // Set up the VirusTotal API request URL
+    const apiUrl = `https://www.virustotal.com/api/v3/urls/${base64EncodeUrl(
+      url
+    )}`;
+
+    // Make the request using fetch
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        "x-apikey": process.env.VIRUS_TOTAL_API_KEY!, // Set your API key in .env
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error fetching VirusTotal data: ${response.statusText}`);
+    }
+
+    const data = await response.json();
 
     // Return the VirusTotal response to the client
     return new NextResponse(
       JSON.stringify({
         message: "Success",
-        data: response.data.data,
+        data: data.data,
       }),
       { status: 200 }
     );

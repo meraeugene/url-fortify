@@ -1,7 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
-import { isValidUrl, base64EncodeUrl } from "../helpers/urlUtils";
+import { isValidUrl } from "../helpers/urlUtils";
 import { AnalysisData } from "@/types";
 
 const useUrlAnalysis = () => {
@@ -18,16 +17,16 @@ const useUrlAnalysis = () => {
     }
   };
 
-  // const fetchScreenshotBase64 = async (url: string): Promise<string> => {
-  //   const apiUrl = `https://v1.nocodeapi.com/444andreiii/screen/sSwWEwDgigwrZXmi/screenshot?url=${encodeURIComponent(
-  //     url
-  //   )}&encoding=base64&full_page=true`;
+  // Get cached data from sessionStorage
+  const getCachedData = (url: string): AnalysisData | null => {
+    const cachedData = sessionStorage.getItem(url);
+    return cachedData ? JSON.parse(cachedData) : null;
+  };
 
-  //   const { data } = await axios.get(apiUrl, {
-  //     headers: { "Content-Type": "application/json" },
-  //   });
-  //   return data; // Returns the Base64-encoded screenshot
-  // };
+  // Cache data in sessionStorage
+  const cacheData = (url: string, data: AnalysisData) => {
+    sessionStorage.setItem(url, JSON.stringify(data));
+  };
 
   const analyzeUrl = async (url: string) => {
     if (!isValidUrl(url)) {
@@ -37,49 +36,65 @@ const useUrlAnalysis = () => {
 
     const trimmedUrl = getDomain(url); // Extract protocol + domain
 
+    // Check if cached data exists in sessionStorage
+    const cachedAnalysisData = getCachedData(trimmedUrl);
+    if (cachedAnalysisData) {
+      setAnalysisData(cachedAnalysisData); // Set the cached data to the state
+      toast.success("URL Analysis Complete"); // Show success toast even when using cached data
+      return; // Skip the API call if cached data is available
+    }
+
     setLoading(true);
 
     try {
-      // Fetch screenshot in Base64 format
-      // const base64Format = await fetchScreenshotBase64(trimmedUrl);
-
-      // Send screenshot to server for further processing
-      // const { data: captureResponse } = await axios.post(
-      //   "/api/capture",
-      //   { url: trimmedUrl },
-      //   { headers: { "Content-Type": "application/json" } }
-      // );
-
       setScreenshotLoading(true); // Set the screenshot loading state to true
-      const { data: captureResponse } = await axios.get(
-        `/api/proxy/capture?url=${encodeURIComponent(trimmedUrl)}`
+
+      // Fetch the screenshot using fetch API
+      const captureResponse = await fetch(
+        `/api/proxy/capture?url=${encodeURIComponent(trimmedUrl)}`,
+        {
+          next: {
+            revalidate: 60 * 60 * 24, //24 hours
+          },
+        }
       );
+      const captureData = await captureResponse.json();
       setScreenshotLoading(false); // Set the screenshot loading state to false when done
 
-      const { screenshot } = captureResponse;
+      const { screenshot } = captureData;
 
       if (screenshot) {
-        const { data: reportData } = await axios.get(
-          `/api/proxy/virustotal?url=${encodeURIComponent(trimmedUrl)}`
+        // Fetch the VirusTotal report using fetch API
+        const reportResponse = await fetch(
+          `/api/proxy/virustotal?url=${encodeURIComponent(trimmedUrl)}`,
+          {
+            next: {
+              revalidate: 60 * 60 * 24, //24 hours
+            },
+          }
         );
+        const reportData = await reportResponse.json();
 
-        // Set the response data into state
         const { categories, last_analysis_stats, last_analysis_results } =
           reportData.data.attributes;
 
-        // Set the sorted data to the state
-        setAnalysisData({
+        // Prepare data to be cached and set in state
+        const analysisData: AnalysisData = {
           screenshot,
           categories,
           lastAnalysisStats: last_analysis_stats,
           lastAnalysisResults: last_analysis_results,
-        });
+        };
+
+        setAnalysisData(analysisData);
+        cacheData(trimmedUrl, analysisData); // Cache the new analysis data
       }
     } catch (error) {
       console.log(error);
       toast.error(`Error processing request: ${error}`);
     } finally {
       setLoading(false);
+      toast.success("URL Analysis Complete");
     }
   };
 
