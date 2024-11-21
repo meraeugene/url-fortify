@@ -6,7 +6,7 @@ import { AnalysisData } from "@/types";
 
 const useUrlAnalysis = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [screenshotLoading, setScreenshotLoading] = useState<boolean>(true); // for screenshot fetching
+  const [screenshotLoading, setScreenshotLoading] = useState<boolean>(false); // for screenshot fetching
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
 
   const getDomain = (url: string): string => {
