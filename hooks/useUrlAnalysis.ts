@@ -49,9 +49,13 @@ const useUrlAnalysis = () => {
     try {
       setScreenshotLoading(true); // Set the screenshot loading state to true
 
+      // Log the encoded URL for the screenshot API call
+      const encodedUrl = encodeURIComponent(trimmedUrl);
+      console.log("Encoded URL for screenshot API:", encodedUrl);
+
       // Fetch the screenshot using fetch API
       const captureResponse = await fetch(
-        `/api/proxy/capture?url=${encodeURIComponent(trimmedUrl)}`,
+        `/api/proxy/capture?url=${encodedUrl}`,
         {
           next: {
             revalidate: 60 * 60 * 24, //24 hours
@@ -64,6 +68,9 @@ const useUrlAnalysis = () => {
       const { screenshot } = captureData;
 
       if (screenshot) {
+        // Log the encoded URL for the VirusTotal API call
+        console.log("Encoded URL for VirusTotal API:", encodedUrl);
+
         // Fetch the VirusTotal report using fetch API
         const reportResponse = await fetch(
           `/api/proxy/virustotal?url=${encodeURIComponent(trimmedUrl)}`,

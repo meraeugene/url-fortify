@@ -128,15 +128,7 @@ export function Analysis({
           <p className="text-base font-normal text-[#F8F8F8] mb-8">
             {description}
           </p>
-          <div
-            className={`shadow-sm ${boxClass} border rounded-lg px-4 py-6`}
-            style={{
-              background: isSafe ? "rgb(4,7,29)" : "rgb(29,7,7)", // Adjust background based on URL status
-              backgroundColor: isSafe
-                ? "linear-gradient(90deg, rgba(3, 59, 43, 1) 0%, rgba(0, 237, 130, 1) 100%)"
-                : "linear-gradient(90deg, rgba(59, 0, 0, 1) 0%, rgba(237, 0, 0, 1) 100%)",
-            }}
-          >
+          <div className={`border rounded-lg px-4 py-6 ${boxClass}`}>
             <h1
               className={`text-center ${titleClass} uppercase tracking-wider text-base lg:text-3xl font-bold`}
             >

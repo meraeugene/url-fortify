@@ -78,10 +78,10 @@ export const getUrlAnalysisStatus = (isSafe: boolean) => {
     ? "Congratulations! The URL has passed all security checks..."
     : "Warning: The URL has been flagged for potential security risks...";
 
-  const titleClass = isSafe ? "text-green-400" : "text-red-500";
+  const titleClass = isSafe ? "text-green-500" : "text-red-500";
   const boxClass = isSafe
     ? "shadow-sm shadow-green-500 border-green-500 "
-    : "shadow-sm shadow-red-500 border-red-500";
+    : "shadow-sm shadow-red-500 border-red-500 ";
 
   return { title, description, titleClass, boxClass };
 };
