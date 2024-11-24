@@ -16,7 +16,7 @@ import toast from "react-hot-toast";
 import { a11yProps, CustomTabPanel } from "./MUI";
 import { isValidImageFile } from "@/helpers/fileUtils";
 import Tesseract from "tesseract.js";
-import { extractFirstUrl, formatUrl } from "@/helpers/urlUtils";
+import { extractUrl, formatUrl } from "@/helpers/urlUtils";
 
 const theme = createTheme({
   palette: {
@@ -67,13 +67,10 @@ const Hero = () => {
         throw Error(errorMessage);
       }
 
-      const { parsedText } = await response.json(); // Destructuring result
+      const { parsedText } = await response.json();
 
-      // Clean up the extracted text
-      let fullText = cleanExtractedText(parsedText);
-
-      // Extract the first URL from the text
-      const link = extractFirstUrl(fullText);
+      // Extract the URL from the text
+      const link = extractUrl(parsedText);
 
       if (!link) {
         throw new Error("No valid URL found in the extracted text.");
@@ -84,7 +81,7 @@ const Hero = () => {
 
       // Set the formatted link in the state and analyze
       setFormattedLink(formattedLink);
-      analyzeUrl(formattedLink);
+      // analyzeUrl(formattedLink);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -92,17 +89,13 @@ const Hero = () => {
     }
   };
 
-  // Helper function to clean extracted text
-  const cleanExtractedText = (text: string) => {
-    return text
-      .replace(/\n/g, " ") // Remove newlines
-      .replace(/\s+/g, " ") // Normalize multiple spaces
-      .trim()
-      .replace(/([a-zA-Z0-9.-]+\/)\s+([a-zA-Z0-9-]+)/g, "$1$2"); // Merge split URLs
-  };
-
   // CHOOSING FILE
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      toast.error("No file selected.");
+      return;
+    }
+
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
 
@@ -121,6 +114,11 @@ const Hero = () => {
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!e.dataTransfer.files || e.dataTransfer.files.length === 0) {
+      toast.error("No file dropped.");
+      return;
+    }
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
@@ -300,9 +298,9 @@ const Hero = () => {
             <Analysis
               url={formattedLink}
               screenshot={analysisData?.screenshot}
-              categories={analysisData.categories}
-              lastAnalysisStats={analysisData.lastAnalysisStats}
-              lastAnalysisResults={analysisData.lastAnalysisResults}
+              categories={analysisData?.categories || []}
+              lastAnalysisStats={analysisData?.lastAnalysisStats || {}}
+              lastAnalysisResults={analysisData?.lastAnalysisResults || {}}
             />
           )}
         </div>

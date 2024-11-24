@@ -11,7 +11,11 @@ const useUrlAnalysis = () => {
   // Get cached data from sessionStorage
   const getCachedData = (url: string): AnalysisData | null => {
     const cachedData = sessionStorage.getItem(url);
-    return cachedData ? JSON.parse(cachedData) : null;
+    try {
+      return cachedData ? JSON.parse(cachedData) : null;
+    } catch {
+      return null;
+    }
   };
 
   // Cache data in sessionStorage
@@ -39,11 +43,14 @@ const useUrlAnalysis = () => {
 
     try {
       // Fetch the screenshot using fetch API
-      const captureResponse = await fetch(`/api/proxy/capture?url=${url}`, {
-        next: {
-          revalidate: 60 * 60 * 24, //24 hours
-        },
-      });
+      const captureResponse = await fetch(
+        `/api/proxy/capture?url=${encodeURIComponent(url)}`,
+        {
+          next: {
+            revalidate: 60 * 60 * 24, // 24 hours
+          },
+        }
+      );
 
       if (!captureResponse.ok) {
         const errorData = await captureResponse.json();
@@ -57,11 +64,14 @@ const useUrlAnalysis = () => {
 
       if (screenshot) {
         // Fetch the VirusTotal report using fetch API
-        const reportResponse = await fetch(`/api/proxy/virustotal?url=${url}`, {
-          next: {
-            revalidate: 60 * 60 * 24, //24 hours
-          },
-        });
+        const reportResponse = await fetch(
+          `/api/proxy/virustotal?url=${encodeURIComponent(url)}`,
+          {
+            next: {
+              revalidate: 60 * 60 * 24, // 24 hours
+            },
+          }
+        );
 
         if (!reportResponse.ok) {
           const errorData = await reportResponse.json();

@@ -1,3 +1,5 @@
+import urlRegex from "url-regex";
+
 // Helper function to check if the url is valid
 export const isValidUrl = (url: string): boolean => {
   try {
@@ -13,11 +15,17 @@ export const base64EncodeUrl = (url: string): string => {
   return btoa(url).replace(/=+$/, "");
 };
 
-// Helper function to extract the first URL from text
-export const extractFirstUrl = (text: string) => {
+// Helper function to clean extracted text and extract the first URL
+export const extractUrl = (text: string) => {
+  const cleanedText = text
+    .replace(/\s+/g, " ") // Normalize spaces and newlines
+    .replace(/([a-zA-Z0-9.-]+\/)\s+([a-zA-Z0-9-]+)/g, "$1$2"); // Merge split URLs
+
+  // Regex to extract url
   const urlRegex =
     /\b((https?:\/\/)?[a-zA-Z][a-zA-Z0-9-]*\.[a-zA-Z]{2,6})(\/[^\s]*)?\b/g;
-  const match = text.match(urlRegex);
+
+  const match = cleanedText.match(urlRegex);
   return match ? match[0] : null;
 };
 
