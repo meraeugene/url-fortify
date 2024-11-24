@@ -221,8 +221,9 @@ const Hero = () => {
                     </div>
                   </form>
                   <p className="mt-4 text-sm text-gray-400 text-center lg:w-1/2 mx-auto">
-                    Paste a URL into the input field above, and click 'Analyze'
-                    to get started and identify potential phishing threats.
+                    Paste a URL into the input field above, and click
+                    &apos;Analyze&apos; to get started and identify potential
+                    phishing threats.
                   </p>
                 </div>
               </CustomTabPanel>
@@ -263,8 +264,8 @@ const Hero = () => {
                 <p className="text-sm mt-4 text-center text-gray-400">
                   Upload an image, and our optical character recognition (OCR)
                   technology will extract any URLs it contains. Simply drag and
-                  drop the file or use the 'Choose File' button to get started
-                  and identify potential phishing threats.
+                  drop the file or use the &apos;Choose File&apos; button to get
+                  started and identify potential phishing threats.
                 </p>
               </CustomTabPanel>
             </Box>
