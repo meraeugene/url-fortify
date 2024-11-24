@@ -70,8 +70,12 @@ const Hero = () => {
       // Clean up the extracted text
       let fullText = cleanExtractedText(parsedText);
 
+      console.log(fullText);
+
       // Extract the first URL from the text
       const link = extractFirstUrl(fullText);
+
+      console.log(link);
 
       if (!link) {
         throw new Error("No valid URL found in the extracted text.");
@@ -83,9 +87,8 @@ const Hero = () => {
       // Set the formatted link in the state and analyze
       setFormattedLink(formattedLink);
       analyzeUrl(formattedLink);
-
-      console.log(formattedLink);
-    } catch (error) {
+    } catch (error: any) {
+      toast.error("Error processing the file");
       console.error("Error processing file:", error);
     } finally {
       setIsProcessingFile(false);

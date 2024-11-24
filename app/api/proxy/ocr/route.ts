@@ -6,18 +6,20 @@ export const POST = async (request: Request) => {
     const formData = await request.formData();
     const file = formData.get("file") as File;
 
-    console.log(file);
-
     if (!file || !(file instanceof File)) {
       throw new Error("No file provided or invalid file format.");
     }
 
     const apiUrl = "https://api.ocr.space/parse/image";
 
+    // Create the query parameters including OCREngine
+    const url = new URL(apiUrl);
+    url.searchParams.append("OCREngine", "2"); // Add OCREngine as a query parameter
+
     const body = new FormData();
     body.append("file", file);
 
-    const response = await fetch(apiUrl, {
+    const response = await fetch(url.toString(), {
       method: "POST",
       headers: {
         apikey: process.env.OCR_API_KEY!,
@@ -29,6 +31,8 @@ export const POST = async (request: Request) => {
       throw new Error("OCR API request failed.");
     }
     const data = await response.json();
+
+    console.log(data);
 
     // Access the parsed text
     const parsedText = data.ParsedResults[0].ParsedText;
