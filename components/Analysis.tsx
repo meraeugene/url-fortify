@@ -10,6 +10,7 @@ import useUrlAnalysis from "@/hooks/useUrlAnalysis";
 import { getUrlAnalysisStatus } from "@/helpers/classesUtils";
 
 export function Analysis({
+  url,
   screenshot,
   categories,
   lastAnalysisResults,
@@ -41,6 +42,21 @@ export function Analysis({
     getUrlAnalysisStatus(isSafe);
 
   const data = [
+    {
+      title: "URL",
+      content: (
+        <h1
+          className="text-2xl p-4 border rounded-lg"
+          style={{
+            background: "rgb(4,7,29)",
+            backgroundColor:
+              "linear-gradient(90deg, rgba(3, 59, 43, 1) 0%, rgba(0, 237, 130, 1) 100%)",
+          }}
+        >
+          {url}
+        </h1>
+      ),
+    },
     {
       title: "Safety Snapshot",
       content: (

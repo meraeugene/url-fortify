@@ -30,6 +30,7 @@ const Hero = () => {
   const [url, setUrl] = useState<string>("");
   const { analyzeUrl, analysisData, loading } = useUrlAnalysis();
   const [isProcessingFile, setIsProcessingFile] = useState(false);
+  const [formattedLink, setFormattedLink] = useState<string | null>(null);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -64,19 +65,18 @@ const Hero = () => {
         const links = fullText.match(urlRegex);
 
         if (links && links.length > 0) {
-          links.forEach((link) => {
-            let formattedLink = link;
+          // Only process the first found link
+          const formattedLink = links[0]
+            .replace(/^(https?:)\/\//, "$1://") // Fix incomplete protocols
+            .startsWith("http")
+            ? links[0] // No change needed if the link already starts with http/https
+            : `http://${links[0]}`; // Prepend http:// if missing
 
-            // Fix incomplete protocols (https:/ or http:/)
-            formattedLink = formattedLink.replace(/^(https?:)\/\//, "$1://");
+          // Set the formatted link in the state
+          setFormattedLink(formattedLink);
 
-            // If no protocol is found, prepend http://
-            if (!formattedLink.startsWith("http")) {
-              formattedLink = `http://${formattedLink}`;
-            }
-
-            analyzeUrl(formattedLink);
-          });
+          // Call the analysis function with the formatted link
+          analyzeUrl(formattedLink);
         } else {
           toast.error("No link found in the image.");
         }
@@ -211,7 +211,10 @@ const Hero = () => {
                         type="text"
                         placeholder="Enter your URL here"
                         value={url}
-                        onChange={(e) => setUrl(e.target.value)}
+                        onChange={(e) => {
+                          setUrl(e.target.value);
+                          setFormattedLink(e.target.value);
+                        }}
                         aria-label="url input"
                       />
                     </div>
@@ -285,6 +288,7 @@ const Hero = () => {
 
           {analysisData && (
             <Analysis
+              url={formattedLink}
               screenshot={analysisData?.screenshot}
               categories={analysisData.categories}
               lastAnalysisStats={analysisData.lastAnalysisStats}

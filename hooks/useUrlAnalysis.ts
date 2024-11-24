@@ -20,6 +20,8 @@ const useUrlAnalysis = () => {
   };
 
   const analyzeUrl = async (url: string) => {
+    console.log(url);
+
     if (!isValidUrl(url)) {
       toast.error("Please enter a valid URL (must start with http or https)");
       return;
@@ -83,6 +85,7 @@ const useUrlAnalysis = () => {
 
         // Prepare data to be cached and set in state
         const analysisData: AnalysisData = {
+          url,
           screenshot,
           categories,
           lastAnalysisStats: last_analysis_stats,

@@ -47,6 +47,7 @@ export interface LastAnalysisStats {
 
 // Represents the data returned from an analysis, including a screenshot and various results.
 export interface AnalysisData {
+  url: string | null;
   screenshot?: string | null; // Screenshot may be missing in some analysis cases
   categories: Categories; // Categories assigned to the URL by various providers
   lastAnalysisStats: LastAnalysisStats; // Statistics from the last analysis
