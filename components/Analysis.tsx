@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { AnalysisStatisticsCard } from "./AnalysisStatisticsCard";
 import { CategoriesCard } from "./CategoriesCard";
 import AnalysisResultsCard from "./AnalysisResultsCard";
-import { Skeleton } from "@/components/ui/Skeleton";
 import useUrlAnalysis from "@/hooks/useUrlAnalysis";
 import { getUrlAnalysisStatus } from "@/helpers/classesUtils";
 
@@ -16,8 +15,6 @@ export function Analysis({
   lastAnalysisResults,
   lastAnalysisStats,
 }: AnalysisData) {
-  const { screenshotLoading } = useUrlAnalysis();
-
   //Define the custom sort order for analysis results
   const sortOrder: AnalysisResult[] = [
     AnalysisResult.Phishing,
@@ -54,17 +51,13 @@ export function Analysis({
             threats.
           </p>
           <div>
-            {screenshotLoading ? (
-              <Skeleton className="w-full h-screen rounded-lg" />
-            ) : (
-              <Image
-                src={screenshot || ""}
-                alt="website screenshot"
-                width={500}
-                height={500}
-                className="rounded-lg object-cover w-full"
-              />
-            )}
+            <Image
+              src={screenshot || ""}
+              alt="website screenshot"
+              width={500}
+              height={500}
+              className="rounded-lg object-cover w-full"
+            />
           </div>
         </div>
       ),

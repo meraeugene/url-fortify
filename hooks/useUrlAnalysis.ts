@@ -6,7 +6,6 @@ import { AnalysisData } from "@/types";
 
 const useUrlAnalysis = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [screenshotLoading, setScreenshotLoading] = useState<boolean>(false); // for screenshot fetching
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
 
   // Get cached data from sessionStorage
@@ -39,8 +38,6 @@ const useUrlAnalysis = () => {
     let successMessage = "";
 
     try {
-      setScreenshotLoading(true); // Set the screenshot loading state to true
-
       // Fetch the screenshot using fetch API
       const captureResponse = await fetch(`/api/proxy/capture?url=${url}`, {
         next: {
@@ -55,7 +52,6 @@ const useUrlAnalysis = () => {
       }
 
       const captureData = await captureResponse.json(); // Parse JSON
-      setScreenshotLoading(false); // Set the screenshot loading state to false when done
 
       const { screenshot } = captureData;
 
@@ -106,7 +102,7 @@ const useUrlAnalysis = () => {
     }
   };
 
-  return { analyzeUrl, analysisData, loading, screenshotLoading };
+  return { analyzeUrl, analysisData, loading };
 };
 
 export default useUrlAnalysis;
