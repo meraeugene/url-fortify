@@ -81,7 +81,7 @@ const Hero = () => {
 
       // Set the formatted link in the state and analyze
       setFormattedLink(formattedLink);
-      // analyzeUrl(formattedLink);
+      analyzeUrl(formattedLink);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
