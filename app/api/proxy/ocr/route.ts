@@ -7,7 +7,10 @@ export const POST = async (request: Request) => {
     const file = formData.get("file") as File;
 
     if (!file || !(file instanceof File)) {
-      throw new Error("No file provided or invalid file format.");
+      return new NextResponse(
+        JSON.stringify({ message: "No file provided or invalid file format." }),
+        { status: 400 }
+      );
     }
 
     const apiUrl = "https://api.ocr.space/parse/image";
