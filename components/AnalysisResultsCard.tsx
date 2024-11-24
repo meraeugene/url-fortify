@@ -19,6 +19,7 @@ const AnalysisResultsCard = ({
     switch (result.toLowerCase()) {
       case "malicious":
       case "phishing":
+      case "spam":
         return {
           color: "text-red-500",
           icon: <RiErrorWarningLine color="#dc2626" />, // Red warning icon

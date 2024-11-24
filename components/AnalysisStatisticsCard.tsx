@@ -8,14 +8,11 @@ export const AnalysisStatisticsCard = ({
   title: string;
   value: number | string;
 }) => {
-  const { boxShadow, textColor } = useMemo(
-    () => getStyleByTitle(title),
-    [title]
-  );
+  const { boxShadow, textColor } = getStyleByTitle(title);
 
   return (
     <div
-      className={`${boxShadow} border p-4`}
+      className={`${boxShadow}  border p-4`}
       style={{
         background: "rgb(4,7,29)",
         backgroundColor:
@@ -23,8 +20,8 @@ export const AnalysisStatisticsCard = ({
         borderRadius: `calc(1.75rem * 0.96)`,
       }}
     >
-      <div className="analysis__container text-center">
-        <h1 className={`text-base  font-semibold tracking-wider ${textColor}`}>
+      <div className="analysis__container  text-center">
+        <h1 className={`text-base font-semibold tracking-wider ${textColor}`}>
           {title.toUpperCase()}
         </h1>
         <p className={`text-center text-3xl font-bold ${textColor}`}>{value}</p>

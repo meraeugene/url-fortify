@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { AnalysisStatisticsCard } from "./AnalysisStatisticsCard";
 import { CategoriesCard } from "./CategoriesCard";
 import AnalysisResultsCard from "./AnalysisResultsCard";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 import useUrlAnalysis from "@/hooks/useUrlAnalysis";
 import { getUrlAnalysisStatus } from "@/helpers/classesUtils";
 
@@ -35,7 +35,8 @@ export function Analysis({
   const isSafe = sortedResults.every(
     (result) =>
       result.result === AnalysisResult.Clean ||
-      result.result === AnalysisResult.Unrated
+      result.result === AnalysisResult.Unrated ||
+      result.result === AnalysisResult.Suspicious
   );
 
   // Get the analysis status from the utility function

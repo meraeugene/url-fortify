@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { isValidUrl } from "../helpers/urlUtils";
@@ -7,15 +8,6 @@ const useUrlAnalysis = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [screenshotLoading, setScreenshotLoading] = useState<boolean>(false); // for screenshot fetching
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
-
-  const getDomain = (url: string): string => {
-    try {
-      const parsedUrl = new URL(url);
-      return `${parsedUrl.protocol}//${parsedUrl.hostname}`;
-    } catch {
-      return url; // fallback to original if parsing fails (not a valid URL)
-    }
-  };
 
   // Get cached data from sessionStorage
   const getCachedData = (url: string): AnalysisData | null => {
@@ -34,56 +26,64 @@ const useUrlAnalysis = () => {
       return;
     }
 
-    const trimmedUrl = getDomain(url); // Extract protocol + domain
-
     // Check if cached data exists in sessionStorage
-    const cachedAnalysisData = getCachedData(trimmedUrl);
+    const cachedAnalysisData = getCachedData(url);
     if (cachedAnalysisData) {
       setAnalysisData(cachedAnalysisData); // Set the cached data to the state
-      toast.success("URL Analysis Complete"); // Show success toast even when using cached data
+      toast.success("URL Analysis Complete");
       return; // Skip the API call if cached data is available
     }
 
     setLoading(true);
 
+    let successMessage = "";
+
     try {
       setScreenshotLoading(true); // Set the screenshot loading state to true
 
-      // Log the encoded URL for the screenshot API call
-      const encodedUrl = encodeURIComponent(trimmedUrl);
-      console.log("Encoded URL for screenshot API:", encodedUrl);
-
       // Fetch the screenshot using fetch API
-      const captureResponse = await fetch(
-        `/api/proxy/capture?url=${encodedUrl}`,
-        {
-          next: {
-            revalidate: 60 * 60 * 24, //24 hours
-          },
-        }
-      );
-      const captureData = await captureResponse.json();
+      const captureResponse = await fetch(`/api/proxy/capture?url=${url}`, {
+        next: {
+          revalidate: 60 * 60 * 24, //24 hours
+        },
+      });
+
+      if (!captureResponse.ok) {
+        const errorData = await captureResponse.json();
+        const errorMessage = errorData?.error;
+        throw new Error(errorMessage);
+      }
+
+      const captureData = await captureResponse.json(); // Parse JSON
       setScreenshotLoading(false); // Set the screenshot loading state to false when done
 
       const { screenshot } = captureData;
 
       if (screenshot) {
-        // Log the encoded URL for the VirusTotal API call
-        console.log("Encoded URL for VirusTotal API:", encodedUrl);
-
         // Fetch the VirusTotal report using fetch API
-        const reportResponse = await fetch(
-          `/api/proxy/virustotal?url=${encodeURIComponent(trimmedUrl)}`,
-          {
-            next: {
-              revalidate: 60 * 60 * 24, //24 hours
-            },
-          }
-        );
+        const reportResponse = await fetch(`/api/proxy/virustotal?url=${url}`, {
+          next: {
+            revalidate: 60 * 60 * 24, //24 hours
+          },
+        });
+
+        if (!reportResponse.ok) {
+          const errorData = await reportResponse.json();
+          const errorMessage = errorData?.error;
+          throw Error(errorMessage);
+        }
+
         const reportData = await reportResponse.json();
 
+        const { message, data } = reportData;
+
+        // If the message is success, save it in the variable
+        if (message === "URL Analysis Complete") {
+          successMessage = message;
+        }
+
         const { categories, last_analysis_stats, last_analysis_results } =
-          reportData.data.attributes;
+          data.attributes;
 
         // Prepare data to be cached and set in state
         const analysisData: AnalysisData = {
@@ -94,14 +94,15 @@ const useUrlAnalysis = () => {
         };
 
         setAnalysisData(analysisData);
-        cacheData(trimmedUrl, analysisData); // Cache the new analysis data
+        cacheData(url, analysisData); // Cache the new analysis data
       }
-    } catch (error) {
-      console.log(error);
-      toast.error(`Error processing request: ${error}`);
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
       setLoading(false);
-      toast.success("URL Analysis Complete");
+      if (successMessage) {
+        toast.success(successMessage);
+      }
     }
   };
 

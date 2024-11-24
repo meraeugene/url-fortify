@@ -49,7 +49,9 @@ export const GET = async (request: Request) => {
       scroll_page: true, // Capture the entire scrollable page
       response_type: "json", // API returns a JSON response
       access_key: process.env.API_FLASH_ACCESS_KEY!, // Your API access key from .env
+      wait_until: "network_idle",
       url, // URL to capture
+      delay: 5,
     };
 
     // Construct the full URL with parameters
@@ -65,7 +67,9 @@ export const GET = async (request: Request) => {
     const response = await fetch(urlWithParams.toString());
 
     if (!response.ok) {
-      throw new Error(`Error fetching screenshot: ${response.statusText}`);
+      throw new Error(
+        "The website could not be accessed. It is temporarily down or no longer available."
+      );
     }
 
     const data = await response.json();
@@ -75,9 +79,13 @@ export const GET = async (request: Request) => {
     });
   } catch (error: any) {
     console.log(error);
-    return new NextResponse("Error in fetching users" + error.message, {
-      status: 500,
-    });
+    return new NextResponse(
+      JSON.stringify({
+        message: "Failed to fetch screenshot",
+        error: error.message,
+      }),
+      { status: 500 }
+    );
   }
 };
 

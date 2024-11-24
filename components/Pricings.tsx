@@ -50,7 +50,7 @@ const Pricings = () => {
                         {formattedPrice(country, card.price)}
                       </h1>
                       <span className=" text-sm font-medium">/</span>
-                      <span className=" text-sm font-medium">month</span>
+                      <span className=" text-sm font-medium ">month</span>
                     </div>
                   ) : // <h1 className="text-sm text-gray-200">Loading...</h1>
                   null}

@@ -1,10 +1,131 @@
+"use client";
+import { FormEvent, SyntheticEvent, useState } from "react";
 import { Spotlight } from "./ui/Spotlight";
 import { TextGenerateEffect } from "./ui/TextGenerateEffect";
-import URLInput from "./URLInput";
+import useUrlAnalysis from "@/hooks/useUrlAnalysis";
+import MagicButton from "./MagicButton";
+import { FaShieldAlt } from "react-icons/fa";
+import { MultiStepLoader } from "./Loader";
+import { Analysis } from "./Analysis";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { RiFileUploadFill } from "react-icons/ri";
+import toast from "react-hot-toast";
+import { a11yProps, CustomTabPanel } from "./MUI";
+import { isValidImageFile } from "@/helpers/fileUtils";
+import Tesseract from "tesseract.js";
 
-const Hero = async () => {
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#00ED82",
+    },
+    mode: "dark",
+  },
+});
+
+const Hero = () => {
+  const [url, setUrl] = useState<string>("");
+  const { analyzeUrl, analysisData, loading } = useUrlAnalysis();
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    analyzeUrl(url.trim());
+    setUrl("");
+  };
+
+  // TABS
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event: SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+  const handleFileUpload = (file: File) => {
+    Tesseract.recognize(file, "eng")
+      .then(({ data: { text } }) => {
+        // Join the extracted text by removing unwanted line breaks
+        let fullText = text.replace(/\n/g, " ").replace(/\s+/g, " ").trim();
+
+        // Cleanup step to merge URLs that might be split across lines or spaces
+        fullText = fullText.replace(
+          /([a-zA-Z0-9.-]+\/)\s+([a-zA-Z0-9-]+)/g,
+          "$1$2"
+        );
+
+        // Updated regex to capture full URLs, including domains like .us
+        const urlRegex =
+          /\b((https?:\/\/)?[a-zA-Z][a-zA-Z0-9-]*\.[a-zA-Z]{2,6})(\/[^\s]*)?\b/g;
+
+        const links = fullText.match(urlRegex);
+
+        if (links && links.length > 0) {
+          links.forEach((link) => {
+            let formattedLink = link;
+
+            // Fix incomplete protocols (https:/ or http:/)
+            formattedLink = formattedLink.replace(/^(https?:)\/\//, "$1://");
+
+            // If no protocol is found, prepend http://
+            if (!formattedLink.startsWith("http")) {
+              formattedLink = `http://${formattedLink}`;
+            }
+
+            analyzeUrl(formattedLink);
+          });
+        } else {
+          toast.error("No link found in the image.");
+        }
+      })
+      .catch((error) => {
+        toast.error(`An error occurred while processing the image: ${error}`);
+      });
+  };
+
+  // CHOOSING FILE
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      if (!isValidImageFile(file)) {
+        toast.error(
+          "Unsupported file format. Please drop a valid image file (JPG, PNG, or WEBP)."
+        );
+        return;
+      }
+
+      handleFileUpload(file);
+    }
+  };
+
+  // DRAG & DROP FILE
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+
+      if (!isValidImageFile(file)) {
+        toast.error(
+          "Unsupported file format. Please drop a valid image file (JPG, PNG, or WEBP)."
+        );
+        return;
+      }
+
+      handleFileUpload(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   return (
-    <div className="pb-32 pt-32 lg:pt-36">
+    <div className="pb-32 pt-14 ">
       {/**
        *  UI: Spotlights
        *  Link: https://ui.aceternity.com/components/spotlight
@@ -51,13 +172,114 @@ const Hero = async () => {
             className="text-center text-[40px] md:text-5xl lg:text-7xl "
           />
 
-          <p className="text-center md:tracking-wider mt-3 mb-6 text-base md:text-lg lg:text-2xl">
+          <p className="text-center md:tracking-wider mt-3 mb-6 text-base md:text-lg lg:text-xl ">
             Welcome to <span className="text-[#00ED82]">URL-Fortify</span> ,
-            your advanced tool for safeguarding against phishing and malicious
-            links.
+            your advanced tool for safeguarding against <br /> phishing and
+            malicious links.
           </p>
 
-          <URLInput />
+          <ThemeProvider theme={theme}>
+            <Box
+              sx={{ width: "100%" }}
+              className="flex items-center justify-center flex-col  "
+            >
+              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  aria-label="basic tabs example"
+                >
+                  <Tab label="URL" {...a11yProps(0)} />
+                  <Tab label="Image" {...a11yProps(1)} />
+                </Tabs>
+              </Box>
+              {/* URL */}
+              <CustomTabPanel className="w-full" value={value} index={0}>
+                <div className="w-full md:w-[90%] lg:w-[80%] mx-auto lg:mt-4">
+                  <form
+                    onSubmit={handleSubmit}
+                    className="flex flex-col md:flex-row items-center gap-2  "
+                  >
+                    <div className="lg:basis-[80%] md:basis-[70%] w-full">
+                      <input
+                        className="bg-slate-950 px-4 border border-green-400 w-full h-12 md:rounded-tl-lg md:rounded-bl-lg rounded-lg lg:rounded-br-none lg:rounded-tr-none"
+                        type="text"
+                        placeholder="Enter your URL here"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        aria-label="url input"
+                      />
+                    </div>
+                    <div className="lg:basis-[20%] md:basis-[30%] basis-full w-full mt-2 md:mt-0 ">
+                      <MagicButton
+                        title={loading ? "Analyzing..." : "Analyze"}
+                        icon={loading ? null : <FaShieldAlt />}
+                        position="left"
+                        disabled={loading}
+                        otherClasses="rounded-lg lg:rounded-none"
+                      />
+                    </div>
+                  </form>
+                  <p className="mt-4 text-sm text-gray-400 text-center lg:w-1/2 mx-auto">
+                    Paste a URL into the input field above, and click 'Analyze'
+                    to get started and identify potential phishing threats.
+                  </p>
+                </div>
+              </CustomTabPanel>
+
+              {/* Image Upload */}
+              <CustomTabPanel
+                value={value}
+                index={1}
+                className="max-w-[400px] 2xl:max-w-[450px]"
+              >
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  className="w-full p-6 border border-green-400 text-center rounded-lg "
+                  style={{
+                    background: "rgb(4,7,29)",
+                    backgroundColor:
+                      "linear-gradient(90deg, rgba(3, 59, 43, 1) 0%, rgba(0, 237, 130, 1) 100%)",
+                  }}
+                >
+                  <p className="mb-4 text-sm  text-gray-400">
+                    Drag and drop a file here, or click the button to upload.
+                  </p>
+                  <input
+                    type="file"
+                    id="fileUpload"
+                    style={{ display: "none" }}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                  />
+                  <MagicButton
+                    title="Choose file"
+                    icon={<RiFileUploadFill fontSize={18} />}
+                    position="left"
+                    htmlFor="fileUpload"
+                  />
+                </div>
+                <p className="text-sm mt-4 text-center text-gray-400">
+                  Upload an image, and our optical character recognition (OCR)
+                  technology will extract any URLs it contains. Simply drag and
+                  drop the file or use the 'Choose File' button to get started
+                  and identify potential phishing threats.
+                </p>
+              </CustomTabPanel>
+            </Box>
+          </ThemeProvider>
+
+          {loading && <MultiStepLoader loading={loading} />}
+
+          {analysisData && (
+            <Analysis
+              screenshot={analysisData?.screenshot}
+              categories={analysisData.categories}
+              lastAnalysisStats={analysisData.lastAnalysisStats}
+              lastAnalysisResults={analysisData.lastAnalysisResults}
+            />
+          )}
         </div>
       </div>
     </div>

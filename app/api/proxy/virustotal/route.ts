@@ -39,7 +39,9 @@ export const GET = async (request: Request) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Error fetching VirusTotal data: ${response.statusText}`);
+      throw new Error(
+        "The website could not be accessed. It may be temporarily down or no longer available."
+      );
     }
 
     const data = await response.json();
@@ -47,17 +49,19 @@ export const GET = async (request: Request) => {
     // Return the VirusTotal response to the client
     return new NextResponse(
       JSON.stringify({
-        message: "Success",
+        message: "URL Analysis Complete",
         data: data.data,
       }),
       { status: 200 }
     );
   } catch (error: any) {
+    console.log(error);
     return new NextResponse(
-      "Error in fetching result from virus total" + error.message,
-      {
-        status: 500,
-      }
+      JSON.stringify({
+        message: "Failed to fetch VirusTotal data",
+        error: error.message,
+      }),
+      { status: 500 }
     );
   }
 };

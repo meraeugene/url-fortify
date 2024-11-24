@@ -6,6 +6,7 @@ export const RISKY_KEYWORDS = [
   "illegal",
   "unethical",
   "suspicious",
+  "spam",
 ];
 
 export const containsRiskyKeyword = (value: string | number): boolean => {
@@ -32,7 +33,7 @@ export const getDescription = (title: string): string | null => {
 export const getStyleByTitle = (title: string) => {
   const styles: Record<string, { boxShadow: string; textColor: string }> = {
     timeout: {
-      boxShadow: "shadow-sm shadow-blue-400",
+      boxShadow: "shadow-sm shadow-blue-500 ",
       textColor: "text-blue-400",
     },
     suspicious: {
@@ -48,7 +49,7 @@ export const getStyleByTitle = (title: string) => {
       textColor: "text-green-500",
     },
     undetected: {
-      boxShadow: "shadow-sm shadow-gray-400",
+      boxShadow: "shadow-sm shadow-gray-500",
       textColor: "text-gray-400",
     },
   };
@@ -80,8 +81,8 @@ export const getUrlAnalysisStatus = (isSafe: boolean) => {
 
   const titleClass = isSafe ? "text-green-500" : "text-red-500";
   const boxClass = isSafe
-    ? "shadow-sm shadow-green-500 border-green-500 "
-    : "shadow-sm shadow-red-500 border-red-500 ";
+    ? "shadow-sm shadow-green-500  "
+    : "shadow-sm shadow-red-500   ";
 
   return { title, description, titleClass, boxClass };
 };
