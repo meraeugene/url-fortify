@@ -72,11 +72,7 @@ const Pricings = () => {
 
                 <div className="mt-7 mb-3 w-full">
                   {card.title !== "Free Plan" && (
-                    <MagicButton
-                      title={`Get ${card.title}`}
-                      position="right"
-                      otherClasses="rounded-lg"
-                    />
+                    <MagicButton title={`Get ${card.title}`} position="right" />
                   )}
                 </div>
               </div>

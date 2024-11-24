@@ -58,9 +58,7 @@ export function Analysis({
       content: (
         <div>
           <p className="text-[#F8F8F8] text-base font-normal mb-8">
-            This snapshot offers a visual preview of the scanned website, along
-            with key security insights to help identify potential phishing
-            threats.
+            This snapshot offers a visual preview of the scanned website.
           </p>
           <div>
             <Image

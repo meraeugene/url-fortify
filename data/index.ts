@@ -19,13 +19,6 @@ export const testimonials = [
     title: "Software Engineer",
     profile: "/fiel.jpg",
   },
-  {
-    quote:
-      "I love using URL-Fortify because I can save myself from potential phishing/fraud.",
-    name: "IT Ervi Jude Arcillas",
-    title: "Information Technology Lead",
-    profile: "/erb.webp",
-  },
 ];
 
 export const pricings = [

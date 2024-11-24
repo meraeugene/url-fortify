@@ -131,7 +131,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="pb-32 pt-14 ">
+    <div className="pb-32 pt-4 lg:pt-14 ">
       {/**
        *  UI: Spotlights
        *  Link: https://ui.aceternity.com/components/spotlight
@@ -224,12 +224,11 @@ const Hero = () => {
                         icon={loading ? null : <FaShieldAlt fontSize={18} />}
                         position="left"
                         disabled={loading}
-                        otherClasses="rounded-lg lg:rounded-none"
                       />
                     </div>
                   </form>
                   <p className="mt-4 text-sm text-gray-400 text-center lg:w-1/2 mx-auto">
-                    Paste a URL into the input field above, and click
+                    Paste a URL into the input field above, and
                     &apos;Analyze&apos; to get started and identify potential
                     phishing threats.
                   </p>
@@ -253,7 +252,7 @@ const Hero = () => {
                   }}
                 >
                   <p className="mb-4 text-sm  text-gray-400">
-                    Drag and drop a file here, or click the button to upload.
+                    Drag and drop a file here, or choose a file.
                   </p>
                   <input
                     type="file"

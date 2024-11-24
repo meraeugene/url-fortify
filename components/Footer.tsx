@@ -33,7 +33,6 @@ const Footer = () => {
             title="Contact Us"
             icon={<FaLocationArrow />}
             position="right"
-            otherClasses="rounded-lg"
           />
         </a>
       </div>

@@ -5,19 +5,19 @@ import { MultiStepLoader as Loader } from "./ui/MultiStepLoader";
 
 const loadingStates = [
   {
-    text: "Capturing website screenshot for Safety Snapshot",
+    text: "Capturing website screenshot",
   },
   {
-    text: "Gathering classification data for Classification Overview",
+    text: "Gathering classification data",
   },
   {
-    text: "Collecting analysis statistics for Analysis Statistics",
+    text: "Collecting analysis statistics",
   },
   {
-    text: "Fetching detailed results for Analysis Results",
+    text: "Fetching detailed results",
   },
   {
-    text: "Finalizing security assessment in Complete Analysis",
+    text: "Finalizing security assessment",
   },
 ];
 
