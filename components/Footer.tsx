@@ -25,8 +25,11 @@ const Footer = () => {
         </h1>
         <p className="text-white-200 md:mt-10 mt-5 mb-8 text-center">
           Get in touch today and learn how{" "}
-          <span className="text-[#00ED82]">URL-Fortify</span> can protect your
-          digital assets from phishing threats.
+          <span className="text-[#00ED82]">
+            {" "}
+            <br /> URL-Fortify
+          </span>{" "}
+          can protect your digital assets from phishing threats.
         </p>
         <a href="mailto:support@phishtrap.io">
           <MagicButton

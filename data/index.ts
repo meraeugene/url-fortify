@@ -3,6 +3,7 @@ export const navItems = [
   { name: "Pricings", link: "#pricings" },
   { name: "Testimonials", link: "#testimonials" },
   { name: "Contact", link: "#contact" },
+  { name: "Login", link: "#login" },
 ];
 
 export const testimonials = [
@@ -185,32 +186,17 @@ export const projects = [
 export const companies = [
   {
     id: 1,
-    name: "cloudinary",
-    img: "/cloud.svg",
-    nameImg: "/cloudName.svg",
+    name: "VIRUS TOTAL",
+    img: "/virustotal.svg",
   },
   {
     id: 2,
-    name: "appwrite",
-    img: "/app.svg",
-    nameImg: "/appName.svg",
+    name: "API FLASH",
+    img: "/apiflash.svg",
   },
   {
     id: 3,
-    name: "HOSTINGER",
-    img: "/host.svg",
-    nameImg: "/hostName.svg",
-  },
-  {
-    id: 4,
-    name: "stream",
-    img: "/s.svg",
-    nameImg: "/streamName.svg",
-  },
-  {
-    id: 5,
-    name: "docker.",
-    img: "/dock.svg",
-    nameImg: "/dockerName.svg",
+    name: "OCR SPACE",
+    img: "/ocr.webp",
   },
 ];

@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import { a11yProps, CustomTabPanel } from "./MUI";
 import { isValidImageFile } from "@/helpers/fileUtils";
 import Tesseract from "tesseract.js";
+import { extractFirstUrl, formatUrl } from "@/helpers/urlUtils";
 
 const theme = createTheme({
   palette: {
@@ -46,48 +47,58 @@ const Hero = () => {
     setValue(newValue);
   };
 
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = async (file: File) => {
     setIsProcessingFile(true);
-    Tesseract.recognize(file, "eng")
-      .then(({ data: { text } }) => {
-        // Join the extracted text by removing unwanted line breaks
-        let fullText = text.replace(/\n/g, " ").replace(/\s+/g, " ").trim();
 
-        // Cleanup step to merge URLs that might be split across lines or spaces
-        fullText = fullText.replace(
-          /([a-zA-Z0-9.-]+\/)\s+([a-zA-Z0-9-]+)/g,
-          "$1$2"
-        );
+    // Create FormData
+    const formData = new FormData();
+    formData.append("file", file);
 
-        // Updated regex to capture full URLs, including domains like .us
-        const urlRegex =
-          /\b((https?:\/\/)?[a-zA-Z][a-zA-Z0-9-]*\.[a-zA-Z]{2,6})(\/[^\s]*)?\b/g;
-
-        const links = fullText.match(urlRegex);
-
-        if (links && links.length > 0) {
-          // Only process the first found link
-          const formattedLink = links[0]
-            .replace(/^(https?:)\/\//, "$1://") // Fix incomplete protocols
-            .startsWith("http")
-            ? links[0] // No change needed if the link already starts with http/https
-            : `http://${links[0]}`; // Prepend http:// if missing
-
-          // Set the formatted link in the state
-          setFormattedLink(formattedLink);
-
-          // Call the analysis function with the formatted link
-          analyzeUrl(formattedLink);
-        } else {
-          toast.error("No link found in the image.");
-        }
-      })
-      .catch((error) => {
-        toast.error(`An error occurred while processing the image: ${error}`);
-      })
-      .finally(() => {
-        setIsProcessingFile(false);
+    try {
+      // Send the file to the API
+      const response = await fetch("/api/proxy/ocr", {
+        method: "POST",
+        body: formData,
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to process the file.");
+      }
+
+      const { parsedText } = await response.json(); // Destructuring result
+
+      // Clean up the extracted text
+      let fullText = cleanExtractedText(parsedText);
+
+      // Extract the first URL from the text
+      const link = extractFirstUrl(fullText);
+
+      if (!link) {
+        throw new Error("No valid URL found in the extracted text.");
+      }
+
+      // Format the link
+      const formattedLink = formatUrl(link);
+
+      // Set the formatted link in the state and analyze
+      setFormattedLink(formattedLink);
+      analyzeUrl(formattedLink);
+
+      console.log(formattedLink);
+    } catch (error) {
+      console.error("Error processing file:", error);
+    } finally {
+      setIsProcessingFile(false);
+    }
+  };
+
+  // Helper function to clean extracted text
+  const cleanExtractedText = (text: string) => {
+    return text
+      .replace(/\n/g, " ") // Remove newlines
+      .replace(/\s+/g, " ") // Normalize multiple spaces
+      .trim()
+      .replace(/([a-zA-Z0-9.-]+\/)\s+([a-zA-Z0-9-]+)/g, "$1$2"); // Merge split URLs
   };
 
   // CHOOSING FILE
@@ -131,7 +142,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="pb-32 pt-4 lg:pt-14 ">
+    <div className="pb-32 pt-4 md:pt-16 lg:pt-4 xl:pt-14 ">
       {/**
        *  UI: Spotlights
        *  Link: https://ui.aceternity.com/components/spotlight
