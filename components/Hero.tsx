@@ -29,6 +29,7 @@ const theme = createTheme({
 const Hero = () => {
   const [url, setUrl] = useState<string>("");
   const { analyzeUrl, analysisData, loading } = useUrlAnalysis();
+  const [isProcessingFile, setIsProcessingFile] = useState(false);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,6 +45,7 @@ const Hero = () => {
   };
 
   const handleFileUpload = (file: File) => {
+    setIsProcessingFile(true);
     Tesseract.recognize(file, "eng")
       .then(({ data: { text } }) => {
         // Join the extracted text by removing unwanted line breaks
@@ -81,6 +83,9 @@ const Hero = () => {
       })
       .catch((error) => {
         toast.error(`An error occurred while processing the image: ${error}`);
+      })
+      .finally(() => {
+        setIsProcessingFile(false);
       });
   };
 
@@ -213,7 +218,7 @@ const Hero = () => {
                     <div className="lg:basis-[20%] md:basis-[30%] basis-full w-full mt-2 md:mt-0 ">
                       <MagicButton
                         title={loading ? "Analyzing..." : "Analyze"}
-                        icon={loading ? null : <FaShieldAlt />}
+                        icon={loading ? null : <FaShieldAlt fontSize={18} />}
                         position="left"
                         disabled={loading}
                         otherClasses="rounded-lg lg:rounded-none"
@@ -255,10 +260,15 @@ const Hero = () => {
                     accept="image/*"
                   />
                   <MagicButton
-                    title="Choose file"
+                    title={
+                      loading || isProcessingFile
+                        ? "Analyzing file..."
+                        : "Choose File"
+                    }
                     icon={<RiFileUploadFill fontSize={18} />}
                     position="left"
                     htmlFor="fileUpload"
+                    disabled={loading || isProcessingFile}
                   />
                 </div>
                 <p className="text-sm mt-4 text-center text-gray-400">
