@@ -12,9 +12,8 @@ export const POST = async (request: Request) => {
 
     const apiUrl = "https://api.ocr.space/parse/image";
 
-    // Create the query parameters including OCREngine
     const url = new URL(apiUrl);
-    url.searchParams.append("OCREngine", "2"); // Add OCREngine as a query parameter
+    url.searchParams.append("OCREngine", "2");
 
     const body = new FormData();
     body.append("file", file);
@@ -28,14 +27,18 @@ export const POST = async (request: Request) => {
     });
 
     if (!response.ok) {
-      throw new Error("OCR API request failed.");
+      throw new Error("OCR API request failed");
     }
+
     const data = await response.json();
 
-    console.log(data);
-
-    // Access the parsed text
     const parsedText = data.ParsedResults[0].ParsedText;
+
+    if (!parsedText) {
+      throw new Error(
+        "The URL could not be extracted from the image. Please ensure the image is clear."
+      );
+    }
 
     return new NextResponse(JSON.stringify({ parsedText }), {
       status: 200,
@@ -44,7 +47,7 @@ export const POST = async (request: Request) => {
     console.log(error);
     return new NextResponse(
       JSON.stringify({
-        message: "Failed to fetch screenshot",
+        message: "OCR API request failed.",
         error: error.message,
       }),
       { status: 500 }

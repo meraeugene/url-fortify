@@ -62,7 +62,9 @@ const Hero = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to process the file.");
+        const errorData = await response.json();
+        const errorMessage = errorData?.error;
+        throw Error(errorMessage);
       }
 
       const { parsedText } = await response.json(); // Destructuring result
@@ -70,12 +72,8 @@ const Hero = () => {
       // Clean up the extracted text
       let fullText = cleanExtractedText(parsedText);
 
-      console.log(fullText);
-
       // Extract the first URL from the text
       const link = extractFirstUrl(fullText);
-
-      console.log(link);
 
       if (!link) {
         throw new Error("No valid URL found in the extracted text.");
@@ -88,8 +86,7 @@ const Hero = () => {
       setFormattedLink(formattedLink);
       analyzeUrl(formattedLink);
     } catch (error: any) {
-      toast.error("Error processing the file");
-      console.error("Error processing file:", error);
+      toast.error(error.message);
     } finally {
       setIsProcessingFile(false);
     }
