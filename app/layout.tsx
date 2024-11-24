@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "URL-Fortify",
   description:
-    "Fortify is a powerful tool designed to detect and intercept potentially malicious URLs, protecting users from phishing scams and ensuring safe browsing experiences.",
+    "Fortify is a powerful tool designed to detect and intercept potentially malicious URLs, protecting users from phishing scams and ensuring a safe browsing experience. It has two features: URL input and image OCR, which can capture URLs from images.",
   openGraph: {
     images: [
       {
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
       },
     ],
     description:
-      "Fortify is a powerful tool designed to detect and intercept potentially malicious URLs, protecting users from phishing scams and ensuring safe browsing experiences.",
+      "Fortify is a powerful tool designed to detect and intercept potentially malicious URLs, protecting users from phishing scams and ensuring a safe browsing experience. It has two features: URL input and image OCR, which can capture URLs from images.",
   },
 };
 
