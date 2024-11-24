@@ -5,34 +5,19 @@ import { MultiStepLoader as Loader } from "./ui/MultiStepLoader";
 
 const loadingStates = [
   {
-    text: "Initializing security scan",
+    text: "Capturing website screenshot for Safety Snapshot",
   },
   {
-    text: "Verifying URL format",
+    text: "Gathering classification data for Classification Overview",
   },
   {
-    text: "Connecting to security databases",
+    text: "Collecting analysis statistics for Analysis Statistics",
   },
   {
-    text: "Checking for known phishing indicators",
+    text: "Fetching detailed results for Analysis Results",
   },
   {
-    text: "Analyzing website reputation",
-  },
-  {
-    text: "Inspecting domain authenticity",
-  },
-  {
-    text: "Reviewing historical threats",
-  },
-  {
-    text: "Assessing site behavior patterns",
-  },
-  {
-    text: "Finalizing security assessment",
-  },
-  {
-    text: "Displaying results",
+    text: "Finalizing security assessment in Complete Analysis",
   },
 ];
 

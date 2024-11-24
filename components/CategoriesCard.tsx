@@ -1,5 +1,22 @@
 import React from "react";
-import { containsRiskyKeyword, getCardClasses } from "../helpers/classesUtils";
+
+const RISKY_KEYWORDS = [
+  "phishing",
+  "fraud",
+  "scam",
+  "illegal",
+  "unethical",
+  "suspicious",
+  "spam",
+];
+
+const containsRiskyKeyword = (value: string | number): boolean => {
+  if (typeof value === "string") {
+    const normalizedValue = value.toLowerCase();
+    return RISKY_KEYWORDS.some((keyword) => normalizedValue.includes(keyword));
+  }
+  return false;
+};
 
 export const CategoriesCard = ({
   title,
@@ -9,11 +26,14 @@ export const CategoriesCard = ({
   value: number | string;
 }) => {
   const hasRiskyValue = containsRiskyKeyword(value);
-  const { shadowClasses, textClasses } = getCardClasses(hasRiskyValue);
 
   return (
     <div
-      className={`${shadowClasses} shadow-sm shadow-green-500  border p-4`}
+      className={`${
+        hasRiskyValue
+          ? "shadow-sm shadow-red-500 "
+          : "shadow-sm shadow-green-500"
+      }   border p-4`}
       style={{
         background: "rgb(4,7,29)",
         backgroundColor:
@@ -26,7 +46,9 @@ export const CategoriesCard = ({
           {title.toUpperCase()}
         </h1>
         <p
-          className={`text-center text-base lg:text-2xl  font-bold ${textClasses}`}
+          className={`${
+            hasRiskyValue ? "text-red-500" : "text-green-500"
+          } text-center text-base lg:text-2xl  font-bold  `}
         >
           {value}
         </p>

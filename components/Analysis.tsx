@@ -6,8 +6,6 @@ import { cn } from "@/lib/utils";
 import { AnalysisStatisticsCard } from "./AnalysisStatisticsCard";
 import { CategoriesCard } from "./CategoriesCard";
 import AnalysisResultsCard from "./AnalysisResultsCard";
-import useUrlAnalysis from "@/hooks/useUrlAnalysis";
-import { getUrlAnalysisStatus } from "@/helpers/classesUtils";
 
 export function Analysis({
   url,
@@ -37,24 +35,22 @@ export function Analysis({
       result.result === AnalysisResult.Suspicious
   );
 
-  // Get the analysis status from the utility function
-  const { title, description, titleClass, boxClass } =
-    getUrlAnalysisStatus(isSafe);
-
   const data = [
     {
       title: "URL",
       content: (
-        <h1
-          className="text-2xl p-4 border rounded-lg"
+        <div
+          className="text-base lg:text-2xl p-4 border rounded-lg w-full max-w-[290px] lg:max-w-[350px]  2xl:max-w-[650px] "
           style={{
             background: "rgb(4,7,29)",
             backgroundColor:
               "linear-gradient(90deg, rgba(3, 59, 43, 1) 0%, rgba(0, 237, 130, 1) 100%)",
+            wordWrap: "break-word",
+            whiteSpace: "normal",
           }}
         >
           {url}
-        </h1>
+        </div>
       ),
     },
     {
@@ -102,7 +98,7 @@ export function Analysis({
             A summary of the latest URL analysis, including classifications for
             malicious, suspicious, harmless, undetected, and timeouts.
           </p>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
+          <div className="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-7">
             {Object.entries(lastAnalysisStats).map(([key, value], index) => (
               <AnalysisStatisticsCard key={index} title={key} value={value} />
             ))}
@@ -119,7 +115,7 @@ export function Analysis({
             of the URL&apos;s safety and any potential security risks identified
             by various engines{" "}
           </p>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 gap-4">
             {Object.entries(sortedResults).map(([_, result], index) => (
               <AnalysisResultsCard
                 key={index}
@@ -136,13 +132,21 @@ export function Analysis({
       content: (
         <>
           <p className="text-base font-normal text-[#F8F8F8] mb-8">
-            {description}
+            {isSafe
+              ? "Congratulations! The URL has passed all security checks..."
+              : "Warning: The URL has been flagged for potential security risks..."}
           </p>
-          <div className={`border rounded-lg px-4 py-6 ${boxClass}`}>
+          <div
+            className={`border rounded-lg p-4 shadow-sm ${
+              isSafe ? "shadow-green-500" : "shadow-red-500"
+            }`}
+          >
             <h1
-              className={`text-center ${titleClass} uppercase tracking-wider text-base lg:text-3xl font-bold`}
+              className={`${
+                isSafe ? "text-green-500" : "text-red-500"
+              } text-center uppercase tracking-wider text-base lg:text-3xl font-bold`}
             >
-              {title}
+              {isSafe ? "Fortified URL" : "Vulnerable URL"}
             </h1>
           </div>
         </>
