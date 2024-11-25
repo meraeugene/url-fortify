@@ -68,22 +68,10 @@ const useUrlAnalysis = () => {
       );
 
       if (!captureResponse.ok) {
-        const contentType = captureResponse.headers.get("Content-Type");
-        if (contentType && contentType.includes("application/json")) {
-          const errorData = await captureResponse.json();
-          const errorMessage = errorData?.error || "Unknown error";
-          // Check for timeout or rate-limit error and provide a custom message
-          if (errorMessage.includes("FUNCTION_INVOCATION_TIMEOUT")) {
-            throw new Error(
-              "The website is still loading or preparing for the API call. Please reload the page and try again."
-            );
-          }
-          throw new Error(errorMessage);
-        } else {
-          const errorData = await captureResponse.json();
-          const errorMessage = errorData?.error;
-          throw new Error(errorMessage);
-        }
+        const errorData = await captureResponse.json();
+        const errorMessage =
+          errorData?.message || "Failed to capture screenshot.";
+        throw new Error(errorMessage);
       }
 
       const captureData = await captureResponse.json(); // Parse JSON
@@ -103,8 +91,9 @@ const useUrlAnalysis = () => {
 
         if (!reportResponse.ok) {
           const errorData = await reportResponse.json();
-          const errorMessage = errorData?.error;
-          throw Error(errorMessage);
+          const errorMessage =
+            errorData?.message || "Failed to fetch VirusTotal report.";
+          throw new Error(errorMessage);
         }
 
         const reportData = await reportResponse.json();

@@ -66,8 +66,10 @@ const Hero = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        const errorMessage = errorData?.error;
-        throw Error(errorMessage);
+        const errorMessage =
+          errorData?.message ||
+          "Failed to scan the screenshot. Please make sure the image is clear and contains text.";
+        throw new Error(errorMessage);
       }
 
       const { parsedText } = await response.json();
@@ -86,6 +88,7 @@ const Hero = () => {
       setFormattedLink(formattedLink);
       analyzeUrl(formattedLink);
     } catch (error: any) {
+      console.log(error);
       toast.error(error.message);
     } finally {
       setIsProcessingFile(false);
@@ -287,9 +290,9 @@ const Hero = () => {
                   />
                 </div>
                 <p className="text-sm mt-4 text-center text-gray-400">
-                 Upload a screenshot containing a URL, and 
-                 our optical character recognition (OCR) technology 
-                 will extract any URL to identify potential phishing threats.
+                  Upload a screenshot containing a URL, and our optical
+                  character recognition (OCR) technology will extract any URL to
+                  identify potential phishing threats.
                 </p>
               </CustomTabPanel>
             </Box>

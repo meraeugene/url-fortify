@@ -7,7 +7,12 @@ export const POST = async (request: Request) => {
     const file = formData.get("file") as File;
 
     if (!file || !(file instanceof File)) {
-      throw new Error("No file provided or invalid file format.");
+      return new NextResponse(
+        JSON.stringify({
+          message: "No file provided or invalid file format.",
+        }),
+        { status: 415 } // 415 Unsupported Media Type is better when file format is incorrect
+      );
     }
 
     const apiUrl = "https://api.ocr.space/parse/image";
@@ -27,7 +32,12 @@ export const POST = async (request: Request) => {
     });
 
     if (!response.ok) {
-      throw new Error("OCR API request failed");
+      return new NextResponse(
+        JSON.stringify({
+          message: "OCR API request failed",
+        }),
+        { status: 502 } // 502 Bad Gateway is better for an API failure
+      );
     }
 
     const data = await response.json();
@@ -40,14 +50,22 @@ export const POST = async (request: Request) => {
       !Array.isArray(data.ParsedResults) ||
       data.ParsedResults.length === 0
     ) {
-      throw new Error(
-        "No parsed text found in the OCR response. Please make sure the image is clear and contains text."
+      return new NextResponse(
+        JSON.stringify({
+          message:
+            "No parsed text found in the OCR response. Please make sure the image is clear and contains text.",
+        }),
+        { status: 422 } // 422 Unprocessable Entity is more appropriate when no parsed results are found
       );
     }
 
     if (!parsedText) {
-      throw new Error(
-        "No URL could be extracted from the image. Please ensure the image is clear and contains a URL."
+      return new NextResponse(
+        JSON.stringify({
+          message:
+            "No URL could be extracted from the image. Please ensure the image is clear and contains a URL.",
+        }),
+        { status: 422 } // 422 Unprocessable Entity as it's a validation issue with the extracted content
       );
     }
 
@@ -55,13 +73,11 @@ export const POST = async (request: Request) => {
       status: 200,
     });
   } catch (error: any) {
-    console.log(error);
     return new NextResponse(
-      JSON.stringify({
-        message: "An error occurred during OCR processing.",
-        error: error.message,
-      }),
-      { status: 500 }
+      "An error occurred during OCR processing." + error.message,
+      {
+        status: 500, // 500 Internal Server Error is correct
+      }
     );
   }
 };
