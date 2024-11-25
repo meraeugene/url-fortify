@@ -16,7 +16,7 @@ import toast from "react-hot-toast";
 import { a11yProps, CustomTabPanel } from "./MUI";
 import { isValidImageFile } from "@/helpers/fileUtils";
 import Tesseract from "tesseract.js";
-import { extractUrl, formatUrl } from "@/helpers/urlUtils";
+import { extractUrl, formatUrl, trimUrl } from "@/helpers/urlUtils";
 
 const theme = createTheme({
   palette: {
@@ -35,8 +35,12 @@ const Hero = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setFormattedLink(url.trim());
-    analyzeUrl(url.trim());
+
+    // Trim the URL to its base domain using the helper function
+    const trimmedUrl = trimUrl(url.trim());
+
+    setFormattedLink(trimmedUrl);
+    analyzeUrl(trimmedUrl);
     setUrl("");
   };
 

@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { isValidUrl } from "../helpers/urlUtils";
+import { isValidUrl, trimUrl } from "../helpers/urlUtils";
 import { AnalysisData } from "@/types";
+
+const CACHE_EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
 
 const useUrlAnalysis = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -10,17 +12,31 @@ const useUrlAnalysis = () => {
 
   // Get cached data from sessionStorage
   const getCachedData = (url: string): AnalysisData | null => {
-    const cachedData = sessionStorage.getItem(url);
     try {
-      return cachedData ? JSON.parse(cachedData) : null;
+      const cached = sessionStorage.getItem(url);
+      if (!cached) return null;
+
+      const { data, expiration } = JSON.parse(cached);
+
+      // If the cache is expired, return null
+      if (Date.now() > expiration) {
+        sessionStorage.removeItem(url); // Remove expired cache
+        return null;
+      }
+
+      return data;
     } catch {
       return null;
     }
   };
 
-  // Cache data in sessionStorage
+  // Cache data in sessionStorage with expiration timestamp
   const cacheData = (url: string, data: AnalysisData) => {
-    sessionStorage.setItem(url, JSON.stringify(data));
+    const expiration = Date.now() + CACHE_EXPIRATION_TIME;
+    console.log("Cache expiration timestamp:", expiration);
+
+    const cachedData = { data, expiration };
+    sessionStorage.setItem(url, JSON.stringify(cachedData));
   };
 
   const analyzeUrl = async (url: string) => {
@@ -29,8 +45,11 @@ const useUrlAnalysis = () => {
       return;
     }
 
+    // Trim the URL to its base domain using the helper function
+    const trimmedUrl = trimUrl(url);
+
     // Check if cached data exists in sessionStorage
-    const cachedAnalysisData = getCachedData(url);
+    const cachedAnalysisData = getCachedData(trimmedUrl);
     if (cachedAnalysisData) {
       setAnalysisData(cachedAnalysisData); // Set the cached data to the state
       toast.success("URL Analysis Complete");
@@ -44,7 +63,7 @@ const useUrlAnalysis = () => {
     try {
       // Fetch the screenshot using fetch API
       const captureResponse = await fetch(
-        `/api/proxy/capture?url=${encodeURIComponent(url)}`,
+        `/api/proxy/capture?url=${encodeURIComponent(trimmedUrl)}`,
         {
           next: {
             revalidate: 60 * 60 * 24, // 24 hours
@@ -65,7 +84,7 @@ const useUrlAnalysis = () => {
       if (screenshot) {
         // Fetch the VirusTotal report using fetch API
         const reportResponse = await fetch(
-          `/api/proxy/virustotal?url=${encodeURIComponent(url)}`,
+          `/api/proxy/virustotal?url=${encodeURIComponent(trimmedUrl)}`,
           {
             next: {
               revalidate: 60 * 60 * 24, // 24 hours
@@ -93,7 +112,7 @@ const useUrlAnalysis = () => {
 
         // Prepare data to be cached and set in state
         const analysisData: AnalysisData = {
-          url,
+          url: trimmedUrl,
           screenshot,
           categories,
           lastAnalysisStats: last_analysis_stats,
@@ -101,7 +120,7 @@ const useUrlAnalysis = () => {
         };
 
         setAnalysisData(analysisData);
-        cacheData(url, analysisData); // Cache the new analysis data
+        cacheData(trimmedUrl, analysisData); // Cache the new analysis data
       }
     } catch (error: any) {
       toast.error(error.message);

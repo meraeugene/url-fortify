@@ -10,6 +10,16 @@ export const isValidUrl = (url: string): boolean => {
   }
 };
 
+// Helper function to trim the URL to its base domain
+export const trimUrl = (url: string): string => {
+  try {
+    const { protocol, hostname } = new URL(url);
+    return `${protocol}//${hostname}`;
+  } catch {
+    return url; // Fallback to the original URL if parsing fails
+  }
+};
+
 // Helper function to encode the URL using base64
 export const base64EncodeUrl = (url: string): string => {
   return btoa(url).replace(/=+$/, "");
