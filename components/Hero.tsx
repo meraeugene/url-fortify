@@ -208,7 +208,7 @@ const Hero = () => {
                   aria-label="basic tabs example"
                 >
                   <Tab label="URL" {...a11yProps(0)} />
-                  <Tab label="Image" {...a11yProps(1)} />
+                  <Tab label="Screenshot" {...a11yProps(1)} />
                 </Tabs>
               </Box>
               {/* URL */}
@@ -247,7 +247,7 @@ const Hero = () => {
                 </div>
               </CustomTabPanel>
 
-              {/* Image Upload */}
+              {/* Screenshot Upload */}
               <CustomTabPanel
                 value={value}
                 index={1}
@@ -264,7 +264,8 @@ const Hero = () => {
                   }}
                 >
                   <p className="mb-4 text-sm  text-gray-400">
-                    Drag and drop a file here, or choose a file.
+                    Drag and drop a screenshot file here, or choose a
+                    screenshot.
                   </p>
                   <input
                     type="file"
@@ -276,8 +277,8 @@ const Hero = () => {
                   <MagicButton
                     title={
                       loading || isProcessingFile
-                        ? "Analyzing file..."
-                        : "Choose File"
+                        ? "Analyzing Screenshot..."
+                        : "Choose Screenshot"
                     }
                     icon={<RiFileUploadFill fontSize={18} />}
                     position="left"
@@ -286,10 +287,11 @@ const Hero = () => {
                   />
                 </div>
                 <p className="text-sm mt-4 text-center text-gray-400">
-                  Upload an image, and our optical character recognition (OCR)
-                  technology will extract any URLs it contains. Simply drag and
-                  drop the file or use the &apos;Choose File&apos; button to get
-                  started and identify potential phishing threats.
+                  Upload a screenshot with URL, and our optical character
+                  recognition (OCR) technology will extract any URL it contains.
+                  Simply drag and drop the screenshot or use the &apos;Choose
+                  Screenshot&apos; button to get started and identify potential
+                  phishing threats.
                 </p>
               </CustomTabPanel>
             </Box>

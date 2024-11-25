@@ -8,7 +8,10 @@ export const POST = async (request: Request) => {
 
     if (!file || !(file instanceof File)) {
       return new NextResponse(
-        JSON.stringify({ message: "No file provided or invalid file format." }),
+        JSON.stringify({
+          message:
+            "No file provided or invalid file format. Please upload a screenshot that contains a URL.",
+        }),
         { status: 400 }
       );
     }
@@ -56,7 +59,7 @@ export const POST = async (request: Request) => {
       return new NextResponse(
         JSON.stringify({
           message:
-            "The image could not be processed. Please ensure the image contains readable text.",
+            "The image could not be processed. Please ensure the image is clear.",
         }),
         { status: 400 }
       );
