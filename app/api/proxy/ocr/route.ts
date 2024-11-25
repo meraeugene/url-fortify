@@ -7,13 +7,7 @@ export const POST = async (request: Request) => {
     const file = formData.get("file") as File;
 
     if (!file || !(file instanceof File)) {
-      return new NextResponse(
-        JSON.stringify({
-          message:
-            "No file provided or invalid file format. Please upload a screenshot that contains a URL.",
-        }),
-        { status: 400 }
-      );
+      throw new Error("No file provided or invalid file format.");
     }
 
     const apiUrl = "https://api.ocr.space/parse/image";
@@ -46,22 +40,14 @@ export const POST = async (request: Request) => {
       !Array.isArray(data.ParsedResults) ||
       data.ParsedResults.length === 0
     ) {
-      return new NextResponse(
-        JSON.stringify({
-          message:
-            "No parsed text found in the OCR response. Please ensure the image is clear.",
-        }),
-        { status: 400 }
+      throw new Error(
+        "No parsed text found in the OCR response. Please ensure the image is clear."
       );
     }
 
     if (!parsedText) {
-      return new NextResponse(
-        JSON.stringify({
-          message:
-            "The image could not be processed. Please ensure the image is clear.",
-        }),
-        { status: 400 }
+      throw new Error(
+        "The URL could not be extracted from the image. Please ensure the image is clear."
       );
     }
 

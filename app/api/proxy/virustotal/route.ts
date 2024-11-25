@@ -7,20 +7,12 @@ export const GET = async (request: Request) => {
     const url = searchParams.get("url");
 
     if (!url) {
-      return new NextResponse(
-        JSON.stringify({
-          message: "URL is required",
-        }),
-        { status: 400 }
-      );
+      throw new Error("URL is required");
     }
 
-    if (!url || typeof url !== "string" || !url.startsWith("http")) {
-      return new NextResponse(
-        JSON.stringify({
-          message: "Please enter a valid URL (must start with http or https)",
-        }),
-        { status: 400 }
+    if (typeof url !== "string" || !url.startsWith("http")) {
+      throw new Error(
+        "Please enter a valid URL (must start with http or https)"
       );
     }
 

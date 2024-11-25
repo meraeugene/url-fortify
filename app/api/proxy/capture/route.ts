@@ -23,20 +23,12 @@ export const GET = async (request: Request) => {
     const url = searchParams.get("url");
 
     if (!url) {
-      return new NextResponse(
-        JSON.stringify({
-          message: "URL is required",
-        }),
-        { status: 400 }
-      );
+      throw new Error("URL is required");
     }
 
     if (typeof url !== "string" || !url.startsWith("http")) {
-      return new NextResponse(
-        JSON.stringify({
-          message: "Please enter a valid URL (must start with http or https)",
-        }),
-        { status: 400 }
+      throw new Error(
+        "Please enter a valid URL (must start with http or https)"
       );
     }
 
@@ -44,10 +36,7 @@ export const GET = async (request: Request) => {
     const accessKey = process.env.API_FLASH_ACCESS_KEY;
 
     if (!accessKey) {
-      return new NextResponse(
-        JSON.stringify({ message: "API key is missing" }),
-        { status: 500 }
-      );
+      throw new Error("API key is missing");
     }
 
     const params = {
