@@ -3,7 +3,6 @@ import React, { FormEvent } from "react";
 import Image from "next/image";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { app } from "@/firebase";
-import toast from "react-hot-toast";
 import axios, { AxiosError } from "axios";
 
 const GoogleLoginButton = () => {
@@ -21,10 +20,8 @@ const GoogleLoginButton = () => {
       );
 
       console.log("response", response);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message || "An error occurred");
-      }
+    } catch (error: any) {
+      console.log(error);
     }
   };
 
