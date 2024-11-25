@@ -5,10 +5,12 @@ import { isValidUrl, trimUrl } from "../helpers/urlUtils";
 import { AnalysisData } from "@/types";
 
 const CACHE_EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
+const MAX_CONSECUTIVE_REQUESTS = 3;
 
 const useUrlAnalysis = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
+  const [requestCount, setRequestCount] = useState(0);
 
   // Get cached data from sessionStorage
   const getCachedData = (url: string): AnalysisData | null => {
@@ -33,8 +35,6 @@ const useUrlAnalysis = () => {
   // Cache data in sessionStorage with expiration timestamp
   const cacheData = (url: string, data: AnalysisData) => {
     const expiration = Date.now() + CACHE_EXPIRATION_TIME;
-    console.log("Cache expiration timestamp:", expiration);
-
     const cachedData = { data, expiration };
     sessionStorage.setItem(url, JSON.stringify(cachedData));
   };
@@ -42,6 +42,13 @@ const useUrlAnalysis = () => {
   const analyzeUrl = async (url: string) => {
     if (!isValidUrl(url)) {
       toast.error("Please enter a valid URL (must start with http or https)");
+      return;
+    }
+
+    if (requestCount >= MAX_CONSECUTIVE_REQUESTS) {
+      toast.error(
+        "You can make a maximum of 3 consecutive requests. Please try again later."
+      );
       return;
     }
 
@@ -57,6 +64,7 @@ const useUrlAnalysis = () => {
     }
 
     setLoading(true);
+    setRequestCount(requestCount + 1);
 
     let successMessage = "";
 
@@ -136,6 +144,11 @@ const useUrlAnalysis = () => {
       if (successMessage) {
         toast.success(successMessage);
       }
+
+      // Reset the request count after a brief delay
+      setTimeout(() => {
+        setRequestCount(0);
+      }, 60000); // Reset after 60 seconds
     }
   };
 
