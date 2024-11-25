@@ -1,16 +1,14 @@
 "use client";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { isValidUrl, trimUrl } from "../helpers/urlUtils";
+import { isValidUrl } from "../helpers/urlUtils";
 import { AnalysisData } from "@/types";
 
 const CACHE_EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
-const MAX_CONSECUTIVE_REQUESTS = 3;
 
 const useUrlAnalysis = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
-  const [requestCount, setRequestCount] = useState(0);
 
   // Get cached data from sessionStorage
   const getCachedData = (url: string): AnalysisData | null => {
@@ -35,6 +33,8 @@ const useUrlAnalysis = () => {
   // Cache data in sessionStorage with expiration timestamp
   const cacheData = (url: string, data: AnalysisData) => {
     const expiration = Date.now() + CACHE_EXPIRATION_TIME;
+    console.log("Cache expiration timestamp:", expiration);
+
     const cachedData = { data, expiration };
     sessionStorage.setItem(url, JSON.stringify(cachedData));
   };
@@ -45,18 +45,8 @@ const useUrlAnalysis = () => {
       return;
     }
 
-    if (requestCount >= MAX_CONSECUTIVE_REQUESTS) {
-      toast.error(
-        "You can make a maximum of 3 consecutive requests. Please try again later."
-      );
-      return;
-    }
-
-    // Trim the URL to its base domain using the helper function
-    const trimmedUrl = trimUrl(url);
-
     // Check if cached data exists in sessionStorage
-    const cachedAnalysisData = getCachedData(trimmedUrl);
+    const cachedAnalysisData = getCachedData(url);
     if (cachedAnalysisData) {
       setAnalysisData(cachedAnalysisData); // Set the cached data to the state
       toast.success("URL Analysis Complete");
@@ -64,14 +54,13 @@ const useUrlAnalysis = () => {
     }
 
     setLoading(true);
-    setRequestCount(requestCount + 1);
 
     let successMessage = "";
 
     try {
       // Fetch the screenshot using fetch API
       const captureResponse = await fetch(
-        `/api/proxy/capture?url=${encodeURIComponent(trimmedUrl)}`,
+        `/api/proxy/capture?url=${encodeURIComponent(url)}`,
         {
           next: {
             revalidate: 60 * 60 * 24, // 24 hours
@@ -80,15 +69,9 @@ const useUrlAnalysis = () => {
       );
 
       if (!captureResponse.ok) {
-        const contentType = captureResponse.headers.get("Content-Type");
-        if (contentType && contentType.includes("application/json")) {
-          const errorData = await captureResponse.json();
-          const errorMessage = errorData?.error || "Unknown error";
-          throw new Error(errorMessage);
-        } else {
-          const text = await captureResponse.text(); // Get the response as plain text
-          throw new Error(`Unexpected response format: ${text}`);
-        }
+        const errorData = await captureResponse.json();
+        const errorMessage = errorData?.error;
+        throw new Error(errorMessage);
       }
 
       const captureData = await captureResponse.json(); // Parse JSON
@@ -98,7 +81,7 @@ const useUrlAnalysis = () => {
       if (screenshot) {
         // Fetch the VirusTotal report using fetch API
         const reportResponse = await fetch(
-          `/api/proxy/virustotal?url=${encodeURIComponent(trimmedUrl)}`,
+          `/api/proxy/virustotal?url=${encodeURIComponent(url)}`,
           {
             next: {
               revalidate: 60 * 60 * 24, // 24 hours
@@ -126,7 +109,7 @@ const useUrlAnalysis = () => {
 
         // Prepare data to be cached and set in state
         const analysisData: AnalysisData = {
-          url: trimmedUrl,
+          url,
           screenshot,
           categories,
           lastAnalysisStats: last_analysis_stats,
@@ -134,7 +117,7 @@ const useUrlAnalysis = () => {
         };
 
         setAnalysisData(analysisData);
-        cacheData(trimmedUrl, analysisData); // Cache the new analysis data
+        cacheData(url, analysisData); // Cache the new analysis data
       }
     } catch (error: any) {
       console.log(error);
@@ -144,11 +127,6 @@ const useUrlAnalysis = () => {
       if (successMessage) {
         toast.success(successMessage);
       }
-
-      // Reset the request count after a brief delay
-      setTimeout(() => {
-        setRequestCount(0);
-      }, 60000); // Reset after 60 seconds
     }
   };
 
