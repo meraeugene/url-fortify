@@ -72,9 +72,15 @@ const useUrlAnalysis = () => {
       );
 
       if (!captureResponse.ok) {
-        const errorData = await captureResponse.json();
-        const errorMessage = errorData?.error;
-        throw new Error(errorMessage);
+        const contentType = captureResponse.headers.get("Content-Type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await captureResponse.json();
+          const errorMessage = errorData?.error || "Unknown error";
+          throw new Error(errorMessage);
+        } else {
+          const text = await captureResponse.text(); // Get the response as plain text
+          throw new Error(`Unexpected response format: ${text}`);
+        }
       }
 
       const captureData = await captureResponse.json(); // Parse JSON
