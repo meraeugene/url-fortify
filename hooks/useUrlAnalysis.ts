@@ -123,6 +123,7 @@ const useUrlAnalysis = () => {
         cacheData(trimmedUrl, analysisData); // Cache the new analysis data
       }
     } catch (error: any) {
+      console.log(error);
       toast.error(error.message);
     } finally {
       setLoading(false);

@@ -31,7 +31,7 @@ export const GET = async (request: Request) => {
       );
     }
 
-    if (!url || typeof url !== "string" || !url.startsWith("http")) {
+    if (typeof url !== "string" || !url.startsWith("http")) {
       return new NextResponse(
         JSON.stringify({
           message: "Please enter a valid URL (must start with http or https)",
@@ -41,16 +41,24 @@ export const GET = async (request: Request) => {
     }
 
     const apiUrl = "https://api.apiflash.com/v1/urltoimage";
+    const accessKey = process.env.API_FLASH_ACCESS_KEY;
+
+    if (!accessKey) {
+      return new NextResponse(
+        JSON.stringify({ message: "API key is missing" }),
+        { status: 500 }
+      );
+    }
 
     const params = {
-      format: "webp", // Output format
-      full_page: true, // Capture the full page
-      no_ads: true, // Block ads on the page
-      scroll_page: true, // Capture the entire scrollable page
-      response_type: "json", // API returns a JSON response
-      access_key: process.env.API_FLASH_ACCESS_KEY!, // Your API access key from .env
+      format: "webp",
+      full_page: true,
+      no_ads: true,
+      scroll_page: true,
+      response_type: "json",
+      access_key: accessKey,
       wait_until: "network_idle",
-      url, // URL to capture
+      url,
       delay: 5,
     };
 
@@ -82,7 +90,7 @@ export const GET = async (request: Request) => {
     return new NextResponse(
       JSON.stringify({
         message: "Failed to fetch screenshot",
-        error: error.message,
+        error: error instanceof Error ? error.message : "Unknown error",
       }),
       { status: 500 }
     );
