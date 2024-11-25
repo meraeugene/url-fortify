@@ -8,6 +8,8 @@ const RISKY_KEYWORDS = [
   "unethical",
   "suspicious",
   "spam",
+  "spyware",
+  "malware",
 ];
 
 const containsRiskyKeyword = (value: string | number): boolean => {

@@ -24,6 +24,10 @@ const getStyleByTitle = (title: string) => {
       boxShadow: "shadow-sm shadow-red-500",
       textColor: "text-red-500",
     },
+    malware: {
+      boxShadow: "shadow-sm shadow-red-500",
+      textColor: "text-red-500",
+    },
     harmless: {
       boxShadow: "shadow-sm shadow-green-500",
       textColor: "text-green-500",
