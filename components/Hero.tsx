@@ -287,11 +287,9 @@ const Hero = () => {
                   />
                 </div>
                 <p className="text-sm mt-4 text-center text-gray-400">
-                  Upload a screenshot with URL, and our optical character
-                  recognition (OCR) technology will extract any URL it contains.
-                  Simply drag and drop the screenshot or use the &apos;Choose
-                  Screenshot&apos; button to get started and identify potential
-                  phishing threats.
+                 Upload a screenshot containing a URL, and 
+                 our optical character recognition (OCR) technology 
+                 will extract any URL to identify potential phishing threats.
                 </p>
               </CustomTabPanel>
             </Box>
