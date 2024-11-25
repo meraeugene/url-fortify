@@ -33,7 +33,6 @@ const useUrlAnalysis = () => {
   // Cache data in sessionStorage with expiration timestamp
   const cacheData = (url: string, data: AnalysisData) => {
     const expiration = Date.now() + CACHE_EXPIRATION_TIME;
-    console.log("Cache expiration timestamp:", expiration);
 
     const cachedData = { data, expiration };
     sessionStorage.setItem(url, JSON.stringify(cachedData));
@@ -69,9 +68,22 @@ const useUrlAnalysis = () => {
       );
 
       if (!captureResponse.ok) {
-        const errorData = await captureResponse.json();
-        const errorMessage = errorData?.error;
-        throw new Error(errorMessage);
+        const contentType = captureResponse.headers.get("Content-Type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await captureResponse.json();
+          const errorMessage = errorData?.error || "Unknown error";
+          // Check for timeout or rate-limit error and provide a custom message
+          if (errorMessage.includes("FUNCTION_INVOCATION_TIMEOUT")) {
+            throw new Error(
+              "The website is still loading or preparing for the API call. Please reload the page and try again."
+            );
+          }
+          throw new Error(errorMessage);
+        } else {
+          const errorData = await captureResponse.json();
+          const errorMessage = errorData?.error;
+          throw new Error(errorMessage);
+        }
       }
 
       const captureData = await captureResponse.json(); // Parse JSON

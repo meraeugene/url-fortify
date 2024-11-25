@@ -15,7 +15,6 @@ import { RiFileUploadFill } from "react-icons/ri";
 import toast from "react-hot-toast";
 import { a11yProps, CustomTabPanel } from "./MUI";
 import { isValidImageFile } from "@/helpers/fileUtils";
-import Tesseract from "tesseract.js";
 import { extractUrl, formatUrl, trimUrl } from "@/helpers/urlUtils";
 
 const theme = createTheme({
