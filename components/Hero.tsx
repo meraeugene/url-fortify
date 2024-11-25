@@ -82,8 +82,6 @@ const Hero = () => {
       // Format the link
       const formattedLink = formatUrl(link);
 
-      console.log(formattedLink);
-
       // Set the formatted link in the state and analyze
       setFormattedLink(formattedLink);
       analyzeUrl(formattedLink);

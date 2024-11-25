@@ -31,9 +31,9 @@ export const extractUrl = (text: string) => {
     .replace(/\s+/g, " ") // Normalize spaces and newlines
     .replace(/([a-zA-Z0-9.-]+\/)\s+([a-zA-Z0-9-]+)/g, "$1$2"); // Merge split URLs
 
-  // Regex to extract url
+  // Regex to extract URL and ignore image extensions like .png, .jpg, .jpeg, etc.
   const urlRegex =
-    /\b((https?:\/\/)?[a-zA-Z][a-zA-Z0-9-]*\.[a-zA-Z]{2,6})(\/[^\s]*)?\b/g;
+    /\b((https?:\/\/)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,6})(\/[^\s]*?)(?=\s|$|\.(?!\w{3,4}))\b/g;
 
   const match = cleanedText.match(urlRegex);
   return match ? match[0] : null;
