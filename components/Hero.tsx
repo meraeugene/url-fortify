@@ -12,10 +12,10 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { RiFileUploadFill } from "react-icons/ri";
-import toast from "react-hot-toast";
 import { a11yProps, CustomTabPanel } from "./MUI";
 import { isValidImageFile } from "@/helpers/fileUtils";
 import { extractUrl, formatUrl, trimUrl } from "@/helpers/urlUtils";
+import { useToast } from "@/hooks/useToast";
 
 const theme = createTheme({
   palette: {
@@ -31,6 +31,8 @@ const Hero = () => {
   const { analyzeUrl, analysisData, loading } = useUrlAnalysis();
   const [isProcessingFile, setIsProcessingFile] = useState(false);
   const [formattedLink, setFormattedLink] = useState<string | null>(null);
+
+  const { toast } = useToast();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -89,7 +91,10 @@ const Hero = () => {
       analyzeUrl(formattedLink);
     } catch (error: any) {
       console.log(error);
-      toast.error(error.message);
+      toast({
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setIsProcessingFile(false);
     }
@@ -98,7 +103,12 @@ const Hero = () => {
   // CHOOSING FILE
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
-      toast.error("No file selected.");
+      toast({
+        title: "No File Selected",
+        description: "Please select an image file to upload.",
+        variant: "destructive",
+      });
+
       return;
     }
 
@@ -106,9 +116,12 @@ const Hero = () => {
       const file = e.target.files[0];
 
       if (!isValidImageFile(file)) {
-        toast.error(
-          "Unsupported file format. Please drop a valid image file (JPG, PNG, or WEBP)."
-        );
+        toast({
+          title: "Unsupported File Format",
+          description: "Please drop a valid image file (JPG, PNG, or WEBP).",
+          variant: "destructive",
+        });
+
         return;
       }
 
@@ -122,7 +135,11 @@ const Hero = () => {
     e.stopPropagation();
 
     if (!e.dataTransfer.files || e.dataTransfer.files.length === 0) {
-      toast.error("No file dropped.");
+      toast({
+        title: "No File Detected",
+        description: "Please drag and drop a file to proceed.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -130,9 +147,12 @@ const Hero = () => {
       const file = e.dataTransfer.files[0];
 
       if (!isValidImageFile(file)) {
-        toast.error(
-          "Unsupported file format. Please drop a valid image file (JPG, PNG, or WEBP)."
-        );
+        toast({
+          title: "Invalid File Format",
+          description:
+            "Unsupported file format. Please drop a valid image file (JPG, PNG, or WEBP).",
+          variant: "destructive",
+        });
         return;
       }
 

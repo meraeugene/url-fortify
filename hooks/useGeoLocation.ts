@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { useToast } from "@/hooks/useToast";
 
 const useGeoLocationService = () => {
   const [ipAddress, setIpAddress] = useState<string | null>(null);
@@ -9,6 +9,8 @@ const useGeoLocationService = () => {
   const [countryName, setCountryName] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false); // Loading state
 
+  const { toast } = useToast();
+
   // Function to get the IP address
   const getIpAddress = async () => {
     try {
@@ -16,7 +18,10 @@ const useGeoLocationService = () => {
       const response = await axios.get("https://get.geojs.io/v1/ip");
       setIpAddress(response.data);
     } catch (error) {
-      toast.error(`Error getting the IP address: ${error}`);
+      toast({
+        title: `Error getting the IP address: ${error}`,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -33,7 +38,10 @@ const useGeoLocationService = () => {
       setCountryCode(response.data.country_3);
       setCountryName(response.data.name);
     } catch (error) {
-      toast.error("Error fetching country data");
+      toast({
+        title: "Error fetching country data",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

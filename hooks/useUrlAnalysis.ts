@@ -1,14 +1,16 @@
 "use client";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { isValidUrl } from "../helpers/urlUtils";
 import { AnalysisData } from "@/types";
+import { useToast } from "@/hooks/useToast";
 
 const CACHE_EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
 
 const useUrlAnalysis = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
+
+  const { toast } = useToast();
 
   // Get cached data from sessionStorage
   const getCachedData = (url: string): AnalysisData | null => {
@@ -40,7 +42,12 @@ const useUrlAnalysis = () => {
 
   const analyzeUrl = async (url: string) => {
     if (!isValidUrl(url)) {
-      toast.error("Please enter a valid URL (must start with http or https)");
+      toast({
+        title: "Invalid URL",
+        description:
+          "Please enter a valid URL (must start with http or https).",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -48,7 +55,9 @@ const useUrlAnalysis = () => {
     const cachedAnalysisData = getCachedData(url);
     if (cachedAnalysisData) {
       setAnalysisData(cachedAnalysisData); // Set the cached data to the state
-      toast.success("URL Analysis Complete");
+      toast({
+        title: "URL Analysis Complete",
+      });
       return; // Skip the API call if cached data is available
     }
 
@@ -122,11 +131,17 @@ const useUrlAnalysis = () => {
       }
     } catch (error: any) {
       console.log(error);
-      toast.error(error.message);
+      toast({
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
       if (successMessage) {
-        toast.success(successMessage);
+        toast({
+          title: successMessage,
+          description: "Your website has been successfully analyzed.",
+        });
       }
     }
   };

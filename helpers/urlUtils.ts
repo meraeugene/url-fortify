@@ -1,5 +1,3 @@
-import urlRegex from "url-regex";
-
 // Helper function to check if the url is valid
 export const isValidUrl = (url: string): boolean => {
   try {
