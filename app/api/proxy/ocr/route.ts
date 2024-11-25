@@ -41,13 +41,13 @@ export const POST = async (request: Request) => {
       data.ParsedResults.length === 0
     ) {
       throw new Error(
-        "No parsed text found in the OCR response. Please ensure the image is clear."
+        "No parsed text found in the OCR response. Please make sure the image is clear and contains text."
       );
     }
 
     if (!parsedText) {
       throw new Error(
-        "The URL could not be extracted from the image. Please ensure the image is clear."
+        "No URL could be extracted from the image. Please ensure the image is clear and contains a URL."
       );
     }
 
