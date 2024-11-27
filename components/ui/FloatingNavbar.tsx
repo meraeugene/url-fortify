@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, FormEvent } from "react";
 import {
   motion,
   AnimatePresence,
@@ -7,22 +7,39 @@ import {
   useMotionValueEvent,
 } from "framer-motion";
 import { cn } from "@/lib/utils";
-
 import Link from "next/link";
+import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import { app } from "@/firebase";
+import { useToast } from "@/hooks/useToast";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { AuthenticatedUserData } from "@/types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/DropdownMenu";
 
-export const FloatingNav = ({
-  navItems,
-  className,
-}: {
+type FloatingNavProps = {
   navItems: {
     name: string;
     link: string;
     icon?: JSX.Element;
   }[];
   className?: string;
-}) => {
-  // const session = await auth();
+  isAuth: boolean;
+  authenticatedUserData: AuthenticatedUserData;
+};
 
+export const FloatingNav = ({
+  navItems,
+  className,
+  authenticatedUserData,
+  isAuth,
+}: FloatingNavProps) => {
   const { scrollYProgress } = useScroll();
 
   // set true for the initial state so that nav bar is visible in the hero section
@@ -57,6 +74,96 @@ export const FloatingNav = ({
     }
   });
 
+  // Get the set user data from Zustand store
+  // const setUserData = useUserStore((state) => state.setUserData);
+
+  // Save data to Zustand store
+  // setUserData(authenticatedUserData);
+
+  // GOOGLE AUTH
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const { user } = authenticatedUserData || {};
+
+  // Loader state
+  const [loading, setLoading] = useState(false);
+
+  const googleLoginAuth = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const auth = getAuth(app);
+
+    try {
+      setLoading(true);
+
+      // Start Google login and fetch in parallel (after sign-in)
+      const signInPromise = signInWithPopup(auth, new GoogleAuthProvider());
+
+      // Wait for the sign-in to complete, but avoid blocking UI updates
+      const { user } = await signInPromise;
+      const { displayName, email, photoURL } = user;
+
+      // Start the fetch request while the sign-in process completes
+      const responsePromise = fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName: displayName, email, photoURL }),
+      });
+
+      // Wait for the fetch response
+      const response = await responsePromise;
+
+      // Check response status and throw error if necessary
+      if (!response.ok) {
+        const errorData = await response.json();
+        const errorMessage =
+          errorData?.message || "An error occurred during login";
+        throw new Error(errorMessage);
+      }
+
+      // Successfully logged in
+      const data = await response.json();
+
+      // Redirect to the appropriate URL
+      router.push(data.redirectURL);
+    } catch (error: any) {
+      console.log(error);
+      toast({
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const errorMessage = errorData?.message;
+        throw new Error(errorMessage);
+      }
+
+      // Successfully logged out
+      const data = await response.json();
+      router.push(data.redirectURL);
+    } catch (error: any) {
+      console.log(error);
+      toast({
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -75,7 +182,7 @@ export const FloatingNav = ({
           // change rounded-full to rounded-lg
           // remove dark:border-white/[0.2] dark:bg-black bg-white border-transparent
           // change  pr-2 pl-8 py-2 to px-10 py-5
-          "flex max-w-fit md:min-w-[50vw] lg:min-w-fit fixed z-[5000] top-10 inset-x-0 mx-auto px-10 py-5 rounded-lg border border-black/.1 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] items-center justify-center space-x-4  text-sm dark:hover:text-neutral-300 hover:text-neutral-500",
+          "flex max-w-fit  lg:min-w-fit fixed z-[100] top-10 inset-x-0 mx-auto px-6 lg:px-8 py-4 lg:py-5 rounded-lg border border-black/.1 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] items-center justify-center space-x-6  text-sm dark:hover:text-neutral-300 hover:text-neutral-500",
           className
         )}
         style={{
@@ -100,11 +207,45 @@ export const FloatingNav = ({
           </Link>
         ))}
 
-        {/* remove this login btn */}
-        {/* <button className="border text-sm font-medium relative border-neutral-200 dark:border-white/[0.2] text-black dark:text-white px-4 py-2 rounded-full">
-          <span>Login</span>
-          <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-blue-500 to-transparent  h-px" />
-        </button> */}
+        {isAuth ? (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Image
+                  src={user.image}
+                  width={28}
+                  height={28}
+                  className="rounded-full "
+                  alt="profile picture"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>
+                  <Link href="/account/overview">Account</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        ) : loading ? (
+          <Image src="/loader.svg" width={30} height={30} alt="loader" />
+        ) : (
+          <form onSubmit={googleLoginAuth}>
+            <button
+              type="submit"
+              disabled={loading}
+              className="border text-sm font-medium relative border-neutral-200 dark:border-white/[0.2] text-black dark:text-white px-4 py-2 rounded-full cursor-pointer"
+            >
+              <span>Login</span>
+              <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-blue-500 to-transparent  h-px" />
+            </button>
+          </form>
+        )}
       </motion.div>
     </AnimatePresence>
   );

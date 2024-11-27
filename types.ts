@@ -1,4 +1,7 @@
 // Represents the categories returned by the analysis, where each key is a provider name
+
+import { Subscription, UsageStats } from "./lib/models/userModel";
+
 // and the value is the category it assigned to the URL (e.g., "social networks").
 export interface Categories {
   [key: string]: string; // Key: provider name (e.g., "BitDefender"), Value: category (e.g., "social networks")
@@ -60,4 +63,22 @@ export interface ErrorResponse {
     message?: string;
   };
   error?: string;
+}
+
+export interface UserData {
+  fullName: string | null; // full name can be null if user is not logged in
+  email: string | null; // email can be null if user is not logged in
+  image: string | null; // photoURL can be null if user doesn't have a photo
+}
+
+export interface AuthenticatedUserData {
+  user: {
+    _id: string; // MongoDB user ID
+    email: string; // User's email
+    fullName: string; // User's full name
+    image: string; // User's profile image
+    role: "user" | "admin"; // User's role
+    subscription: Subscription; // User's subscription details
+    usageStats: UsageStats; // User's usage statistics
+  };
 }

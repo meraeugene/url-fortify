@@ -8,7 +8,7 @@ import Image from "next/image";
 
 const Clients = () => {
   return (
-    <section id="testimonials" className="py-20">
+    <section id="reviews" className="py-20">
       <h1 className="heading">
         Kind words from
         <span className="text-[#00ED82]"> satisfied clients</span>

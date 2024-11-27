@@ -1,9 +1,7 @@
 export const navItems = [
-  { name: "About", link: "#about" },
+  { name: "Home", link: "#home" },
   { name: "Pricings", link: "#pricings" },
-  { name: "Testimonials", link: "#testimonials" },
-  { name: "Contact", link: "#contact" },
-  { name: "Login", link: "#login" },
+  { name: "Reviews", link: "#reviews" },
 ];
 
 export const testimonials = [
@@ -22,50 +20,52 @@ export const testimonials = [
   },
 ];
 
-export const pricings = [
+export const pricingPlans = [
   {
     id: 1,
     title: "Free Plan",
     price: 0,
-    dailyLookups: 10,
     desc: "Individuals or small-scale users",
     features: [
-      "10 lookups per day",
-      "Basic snapshot of the website",
-      "5 image-based URL scans per day",
+      "25 URL scans per month",
+      "25 basic snapshot of the website per month",
+      "25 screenshot-based URL scans per month",
       "Classification overview",
-      "Basic analysis",
+      "Complete analysis",
     ],
+    offer: "free-plan",
   },
   {
     id: 2,
     title: "Standard Plan",
     price: 149,
-    dailyLookups: 350,
     desc: "Regular users or small businesses",
     features: [
-      "350 lookups per day",
-      "Full website screenshot",
-      "10 image-based URL scans per day",
+      "75 URL scans  per month",
+      "75 full website screenshot per month",
+      "75 screenshot-based URL scans per month",
       "Classification overview",
       "Detailed analysis statistics",
       "Detailed analysis result",
+      "Complete analysis",
     ],
+    offer: "standard-plan",
   },
   {
     id: 3,
     title: "Professional Plan",
     price: 249,
-    dailyLookups: 500,
     desc: "Cybersecurity teams or large businesses",
     features: [
-      "500 lookups per day",
-      "Full website screenshot",
-      "Unlimited image-based URL scanning",
+      "100 URL scans  per month",
+      "100 full website screenshot per month",
+      "100 screenshot-based URL scans per month",
       "Classification overview",
       "Detailed analysis statistics",
       "Detailed analysis result",
+      "Complete analysis",
     ],
+    offer: "professional-plan",
   },
 ];
 
