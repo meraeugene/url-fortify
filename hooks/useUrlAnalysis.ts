@@ -76,6 +76,14 @@ const useUrlAnalysis = () => {
         }
       );
 
+      if (captureResponse.status === 504) {
+        toast({
+          title: "API Flash Service Timeout",
+          description:
+            "The API Flash service is currently experiencing delays in capturing the screenshot.  Please try again later. If this issue persists, it may indicate temporary service disruptions. ",
+        });
+      }
+
       if (!captureResponse.ok) {
         const errorData = await captureResponse.json();
         const errorMessage =
@@ -97,6 +105,14 @@ const useUrlAnalysis = () => {
             },
           }
         );
+
+        if (reportResponse.status === 504) {
+          toast({
+            title: "VirusTotal API Timeout",
+            description:
+              "The VirusTotal API is currently taking longer than expected to respond. Please try again in a few moments. If this issue persists, it may indicate temporary service disruptions.",
+          });
+        }
 
         if (!reportResponse.ok) {
           const errorData = await reportResponse.json();

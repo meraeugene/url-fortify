@@ -66,6 +66,14 @@ const Hero = () => {
         body: formData,
       });
 
+      if (response.status === 504) {
+        toast({
+          title: "OCR Service Timeout",
+          description:
+            "The OCR service is taking longer than expected to process the file. Please try again later. If the issue persists, it could be due to temporary service disruptions.",
+        });
+      }
+
       if (!response.ok) {
         const errorData = await response.json();
         const errorMessage =
