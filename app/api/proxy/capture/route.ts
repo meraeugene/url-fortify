@@ -73,6 +73,16 @@ export const GET = async (request: Request) => {
 
     const response = await fetch(urlWithParams.toString());
 
+    if (response.status === 504) {
+      return new NextResponse(
+        JSON.stringify({
+          message:
+            "The API Flash service is currently experiencing delays in capturing the screenshot.  Please try again later. If this issue persists, it may indicate temporary service disruptions.",
+        }),
+        { status: 504 } // 504 Gateway Timeout
+      );
+    }
+
     if (!response.ok) {
       return new NextResponse(
         JSON.stringify({

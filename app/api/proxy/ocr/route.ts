@@ -31,6 +31,16 @@ export const POST = async (request: Request) => {
       body,
     });
 
+    if (response.status === 504) {
+      return new NextResponse(
+        JSON.stringify({
+          message:
+            "The OCR service is taking longer than expected to process the file. Please try again later. If the issue persists, it could be due to temporary service disruptions.",
+        }),
+        { status: 504 } // 504 Gateway Timeout
+      );
+    }
+
     if (!response.ok) {
       return new NextResponse(
         JSON.stringify({

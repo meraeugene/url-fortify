@@ -36,6 +36,16 @@ export const GET = async (request: Request) => {
       },
     });
 
+    if (response.status === 504) {
+      return new NextResponse(
+        JSON.stringify({
+          message:
+            "The VirusTotal API is currently taking longer than expected to respond. Please try again in a few moments. If this issue persists, it may indicate temporary service disruptions.",
+        }),
+        { status: 504 } // 504 Gateway Timeout
+      );
+    }
+
     if (!response.ok) {
       return new NextResponse(
         JSON.stringify({
