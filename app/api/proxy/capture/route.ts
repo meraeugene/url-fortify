@@ -71,10 +71,7 @@ export const GET = async (request: Request) => {
       urlWithParams.searchParams.append(key, String(value));
     });
 
-    const start = Date.now(); // Start measuring time
     const response = await fetch(urlWithParams.toString());
-    const duration = Date.now() - start; // Calculate duration
-    console.log(`API Flash response time: ${duration}ms`);
 
     if (!response.ok) {
       return new NextResponse(
