@@ -6,7 +6,7 @@ import { initializeApp } from "firebase/app";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyA0W9dAp86tglqh83QE2Uy12E8kFhYtTL4",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
   authDomain: "url-fortify.firebaseapp.com",
   projectId: "url-fortify",
   storageBucket: "url-fortify.firebasestorage.app",
