@@ -1,5 +1,4 @@
 import { Skeleton } from "@/components/ui/Skeleton";
-import React from "react";
 
 const loading = () => {
   const array = new Array(6).fill(null);
