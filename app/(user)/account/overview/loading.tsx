@@ -1,4 +1,4 @@
-import { Skeleton } from "../../../../components/ui/Skeleton";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 const loading = () => {
   const array = new Array(6).fill(null);
