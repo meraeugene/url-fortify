@@ -1,15 +1,17 @@
 import React from "react";
 import { getUser } from "@/lib/dal";
 import { FiEdit2 } from "react-icons/fi";
-import { MdOutlineNavigateNext } from "react-icons/md";
 import {
   IoDiamondOutline,
   IoCloseOutline,
   IoPricetagOutline,
-  IoLockClosedOutline,
   IoArrowBack,
 } from "react-icons/io5";
-import { MdOutlinePayments } from "react-icons/md";
+import {
+  MdOutlinePayments,
+  MdOutlineDataUsage,
+  MdOutlineNavigateNext,
+} from "react-icons/md";
 import { BiSupport } from "react-icons/bi";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,6 +29,11 @@ const page = async () => {
       title: "Account",
       links: [
         { href: "/account/profile", label: "Edit profile", icon: <FiEdit2 /> },
+        {
+          href: "/account/usage",
+          label: "Usage",
+          icon: <MdOutlineDataUsage />,
+        },
       ],
     },
     {
@@ -73,11 +80,11 @@ const page = async () => {
 
   return (
     <div className="bg-black-100 py-8 px-4 lg:py-10">
-      <div className=" md:max-w-xl lg:max-w-[60vw] xl:max-w-[40vw]  mx-auto">
+      <div className=" md:max-w-xl lg:max-w-[60vw] xl:max-w-[40vw] 2xl:max-w-[35vw]  mx-auto">
         <div className=" mb-8 flex flex-col gap-4 ">
           <Link
             href="/"
-            className="bg-gray-700 hover:bg-gray-600 transition-all duration-300 ease-in-out p-2 rounded-sm w-[40px] flex items-center justify-center"
+            className="bg-gray-700 hover:bg-gray-600 transition-all duration-300 ease-in-out p-2 rounded-sm w-[15%] md:w-[10%] flex items-center justify-center"
           >
             <IoArrowBack />
           </Link>

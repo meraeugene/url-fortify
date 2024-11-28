@@ -10,6 +10,7 @@ export interface Subscription {
 
 export interface UsageStats {
   monthlyLookupsUsed: number;
+  lastResetDate: Date; // Track when the lookups were last reset
 }
 
 interface User extends Document {
@@ -74,6 +75,10 @@ const UserSchema = new Schema<User>({
     monthlyLookupsUsed: {
       type: Number,
       default: 0,
+    },
+    lastResetDate: {
+      type: Date,
+      default: new Date(), // Track when limits were last reset
     },
   },
 });

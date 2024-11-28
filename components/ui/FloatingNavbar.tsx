@@ -121,10 +121,8 @@ export const FloatingNav = ({
         throw new Error(errorMessage);
       }
 
-      // Successfully logged in
+      // // Successfully logged in
       const data = await response.json();
-
-      // Redirect to the appropriate URL
       router.push(data.redirectURL);
     } catch (error: any) {
       console.log(error);
@@ -152,7 +150,7 @@ export const FloatingNav = ({
         throw new Error(errorMessage);
       }
 
-      // Successfully logged out
+      // // Successfully logged out
       const data = await response.json();
       router.push(data.redirectURL);
     } catch (error: any) {
@@ -212,7 +210,7 @@ export const FloatingNav = ({
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Image
-                  src={user.image}
+                  src={user?.image || "/profile.jpg"}
                   width={28}
                   height={28}
                   className="rounded-full "

@@ -4,7 +4,7 @@ const loading = () => {
   const array = new Array(6).fill(null);
   return (
     <div className="bg-black-100 py-8 px-4">
-      <div className=" md:max-w-2xl mx-auto lg:max-w-[60vw] xl:max-w-[40vw]  flex flex-col items-center justify-center">
+      <div className=" md:max-w-2xl mx-auto lg:max-w-[60vw] xl:max-w-[40vw] 2xl:max-w-[35vw]   flex flex-col items-center justify-center">
         <div className="grid grid-cols-1 gap-4 w-full">
           {array.map((_, index) => (
             <Skeleton

@@ -8,7 +8,7 @@ interface Feature {
 
 interface PricingPlan extends Document {
   title: string;
-  monthlyLookups: number;
+  monthlyLookups: number; // Max scans per month for this plan
   features: Feature[];
   price: number; // Stored in cents for accuracy
 }
