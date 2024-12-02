@@ -24,6 +24,8 @@ const page = async () => {
     monthlyLookups: 0,
   };
 
+  const monthlyLookupsUsed = usageStats.monthlyLookupsUsed ?? 0;
+
   return (
     <div className="bg-black-100 py-8 px-4 lg:py-10 ">
       <div className=" md:max-w-xl flex flex-col gap-10  lg:max-w-[60vw] xl:max-w-[40vw] 2xl:max-w-[35vw]  mx-auto">
@@ -71,16 +73,13 @@ const page = async () => {
                 <div className="mt-7 mb-3 px-5">
                   {/* Check if the user has reached the maximum usage limit */}
                   {
-                    usageStats.monthlyLookupsUsed >=
-                    currentPlan.monthlyLookups ? (
+                    monthlyLookupsUsed >= currentPlan.monthlyLookups ? (
                       <p className="text-red-500 text-sm mb-6">
                         You have reached your usage limit! <br /> Please upgrade
                         your plan for more lookups.
                       </p>
                     ) : /* If usage is nearing 80% of the limit, show a warning message */
-                    usageStats.monthlyLookupsUsed /
-                        currentPlan.monthlyLookups >=
-                      0.8 ? (
+                    monthlyLookupsUsed / currentPlan.monthlyLookups >= 0.8 ? (
                       <p className="text-yellow-300 text-sm mb-6">
                         You are approaching your usage limit! <br /> Consider
                         upgrading your plan for more lookups.
