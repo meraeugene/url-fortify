@@ -6,14 +6,14 @@ interface Feature {
   value: string | number | boolean;
 }
 
-interface PricingPlan extends Document {
+interface SubscriptionPlan extends Document {
   title: string;
   monthlyLookups: number; // Max scans per month for this plan
   features: Feature[];
   price: number; // Stored in cents for accuracy
 }
 
-const PricingPlanSchema = new Schema<PricingPlan>({
+const SubscriptionPlanSchema = new Schema<SubscriptionPlan>({
   title: {
     type: String,
     required: true,
@@ -44,7 +44,8 @@ const PricingPlanSchema = new Schema<PricingPlan>({
   },
 });
 
-const PricingPlan =
-  models?.PricingPlan || model<PricingPlan>("PricingPlan", PricingPlanSchema);
+const SubscriptionPlan =
+  models?.SubscriptionPlan ||
+  model<SubscriptionPlan>("SubscriptionPlan", SubscriptionPlanSchema);
 
-export default PricingPlan;
+export default SubscriptionPlan;

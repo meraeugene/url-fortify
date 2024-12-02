@@ -22,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
+import { useUserStore } from "@/stores/useUserStore";
 
 type FloatingNavProps = {
   navItems: {
@@ -74,17 +75,11 @@ export const FloatingNav = ({
     }
   });
 
-  // Get the set user data from Zustand store
-  // const setUserData = useUserStore((state) => state.setUserData);
-
-  // Save data to Zustand store
-  // setUserData(authenticatedUserData);
+  const user = authenticatedUserData || {};
 
   // GOOGLE AUTH
   const router = useRouter();
   const { toast } = useToast();
-
-  const { user } = authenticatedUserData || {};
 
   // Loader state
   const [loading, setLoading] = useState(false);
@@ -152,6 +147,7 @@ export const FloatingNav = ({
 
       // // Successfully logged out
       const data = await response.json();
+
       router.push(data.redirectURL);
     } catch (error: any) {
       console.log(error);
@@ -213,7 +209,7 @@ export const FloatingNav = ({
                   src={user?.image || "/profile.jpg"}
                   width={28}
                   height={28}
-                  className="rounded-full "
+                  className="rounded-full object-cover aspect-square"
                   alt="profile picture"
                 />
               </DropdownMenuTrigger>

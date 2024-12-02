@@ -10,7 +10,7 @@ export async function encrypt(payload: any) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("7d")
+    .setExpirationTime("1d")
     .sign(encodedKey);
 }
 
@@ -21,7 +21,7 @@ export async function decrypt(session: string | undefined = "") {
     });
     return payload;
   } catch (error) {
-    console.log("Failed to verify session", error);
+    console.log("User is not authenticated");
   }
 }
 
@@ -31,6 +31,19 @@ export async function createSession(userId: string) {
 
   const cookieStore = await cookies();
   cookieStore.set("session", session, {
+    httpOnly: true,
+    secure: true,
+    expires: expiresAt,
+    sameSite: "lax",
+    path: "/",
+  });
+}
+export async function createGuessSession(userId: string, role: string) {
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+  const session = await encrypt({ userId, expiresAt, role });
+
+  const cookieStore = await cookies();
+  cookieStore.set("guessSession", session, {
     httpOnly: true,
     secure: true,
     expires: expiresAt,

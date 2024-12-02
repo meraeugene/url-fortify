@@ -28,7 +28,8 @@ const theme = createTheme({
 
 const Hero = () => {
   const [url, setUrl] = useState<string>("");
-  const { analyzeUrl, analysisData, loading } = useUrlAnalysis();
+  const { analyzeUrl, analysisData, loading, scanLimitError } =
+    useUrlAnalysis();
   const [isProcessingFile, setIsProcessingFile] = useState(false);
   const [formattedLink, setFormattedLink] = useState<string | null>(null);
 
@@ -328,7 +329,8 @@ const Hero = () => {
 
           {loading && <MultiStepLoader loading={loading} />}
 
-          {analysisData && (
+          {/* IF ANALYSIS DATA EXIST AND SCAN LIMIT ERROR IS FALSE */}
+          {analysisData && !scanLimitError && (
             <Analysis
               url={formattedLink}
               screenshot={analysisData?.screenshot}

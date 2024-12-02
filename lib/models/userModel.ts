@@ -13,7 +13,7 @@ export interface UsageStats {
   lastResetDate: Date; // Track when the lookups were last reset
 }
 
-interface User extends Document {
+export interface User extends Document {
   email: string;
   image: string;
   fullName?: string;
@@ -47,7 +47,7 @@ const UserSchema = new Schema<User>({
   subscription: {
     currentPlan: {
       type: Schema.Types.ObjectId,
-      ref: "PricingPlan",
+      ref: "SubscriptionPlan",
       default: null, // Default to no subscription
     },
     planStartDate: {

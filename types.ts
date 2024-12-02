@@ -1,7 +1,5 @@
 // Represents the categories returned by the analysis, where each key is a provider name
 
-import { Subscription, UsageStats } from "./lib/models/userModel";
-
 // and the value is the category it assigned to the URL (e.g., "social networks").
 export interface Categories {
   [key: string]: string; // Key: provider name (e.g., "BitDefender"), Value: category (e.g., "social networks")
@@ -71,14 +69,52 @@ export interface UserData {
   image: string | null; // photoURL can be null if user doesn't have a photo
 }
 
+export interface GuestSession {
+  userId: string; // The unique identifier for the authenticated user (e.g., "674869e22231f1738f72973b")
+  expiresAt?: string; // The expiration date of the session in ISO string format
+  role: unknown; // Fixed role for a guest user
+  iat?: number; // Issued at (JWT standard - timestamp of when the token was issued)
+  exp?: number; // Expiration time (JWT standard - timestamp of when the token expires)
+  isAuth: boolean;
+}
+
+export interface Session {
+  userId: string; // The unique identifier for the authenticated user (e.g., "674869e22231f1738f72973b")
+  expiresAt?: string; // The expiration date of the session in ISO string format
+  iat?: number; // Issued at (JWT standard - timestamp of when the token was issued)
+  exp?: number; // Expiration time (JWT standard - timestamp of when the token expires)
+}
+
+export interface Subscription {
+  currentPlan: CurrentPlan;
+  status: string; // Example: 'active' | 'inactive'
+}
+
+export interface CurrentPlan {
+  features: PlanFeature[];
+  monthlyLookups: number;
+  price: number;
+  title: string;
+  _id: string; // MongoDB ObjectId as a string
+}
+
+export interface PlanFeature {
+  name: string;
+  value: number | boolean; // Some features have numeric values; others are boolean
+  _id: string; // MongoDB ObjectId as a string
+}
+
+export interface UsageStats {
+  lastResetDate: Date; // Date type to handle timestamp
+  monthlyLookupsUsed: number; // Tracks usage for the current month
+}
+
 export interface AuthenticatedUserData {
-  user: {
-    _id: string; // MongoDB user ID
-    email: string; // User's email
-    fullName: string; // User's full name
-    image: string; // User's profile image
-    role: "user" | "admin"; // User's role
-    subscription: Subscription; // User's subscription details
-    usageStats: UsageStats; // User's usage statistics
-  };
+  _id: string; // MongoDB user ID
+  email: string; // User's email
+  fullName: string; // User's full name
+  image: string; // User's profile image
+  role: "user" | "admin"; // User's role
+  subscription: Subscription; // User's subscription details
+  usageStats: UsageStats; // User's usage statistics
 }

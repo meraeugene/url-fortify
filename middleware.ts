@@ -1,39 +1,68 @@
 import { NextRequest, NextResponse } from "next/server";
-import { decrypt } from "@/lib/session";
+import { createGuessSession, decrypt } from "@/lib/session";
 import { cookies } from "next/headers";
+import { v4 as uuidv4 } from "uuid";
 
-// 1. Specify protected and public routes
-const protectedRoutes = ["/dashboard"];
-const publicRoutes = ["/"];
+// Specify protected and public routes
+const protectedRoutes = [
+  "/account/overview",
+  "/account/profile",
+  "/account/usage",
+  "/purchase/offer/[offer]",
+];
+const protectedAPIRoutes = ["/api/user"];
+const dynamicProtectedRoutes = [/^\/purchase\/offer\/[^\/]+$/]; // Regex for dynamic routes
+// const publicRoutes = ["/"];
 
 export default async function middleware(req: NextRequest) {
-  // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.includes(path);
-  const isPublicRoute = publicRoutes.includes(path);
 
-  // 3. Decrypt the session from the cookie
+  // Check if the current route matches a protected or public route
+  const isProtectedRoute =
+    protectedRoutes.includes(path) ||
+    dynamicProtectedRoutes.some((regex) => regex.test(path));
+  const isProtectedAPIRoute = protectedAPIRoutes.includes(path);
+
+  // const isPublicRoute = publicRoutes.includes(path);
+
+  // Decrypt the session from the cookie
   const cookie = (await cookies()).get("session")?.value;
   const session = await decrypt(cookie);
 
-  // 4. Redirect to / if the user is not authenticated
+  // Decrypt the guess session from the cookie
+  const guessCookie = (await cookies()).get("guessSession")?.value;
+  const guessSession = await decrypt(guessCookie);
+
+  // If the session and guess session does not exist, create one for guest users (only regenerate id if session is expired)
+  if (!session && !guessSession) {
+    await createGuessSession(`guest-${uuidv4()}`, "guest");
+  }
+
   if (isProtectedRoute && !session?.userId) {
+    // Redirect to / if the user is not authenticated for a protected route
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 
-  // 5. Redirect to / if the user is authenticated
-  if (
-    isPublicRoute &&
-    session?.userId &&
-    !req.nextUrl.pathname.startsWith("/")
-  ) {
-    return NextResponse.redirect(new URL("/", req.nextUrl));
+  // Protect API routes
+  if (isProtectedAPIRoute && !session?.userId) {
+    return NextResponse.json(
+      { message: "Not authorized, token failed" },
+      { status: 401 }
+    );
   }
+
+  // Redirect to / if the user is authenticated but trying to access a public route (optional if u have log in / signup page)
+  // if (
+  //   isPublicRoute &&
+  //   session?.userId &&
+  //   !req.nextUrl.pathname.startsWith("/")
+  // ) {
+  //   return NextResponse.redirect(new URL("/", req.nextUrl));
+  // }
 
   return NextResponse.next();
 }
 
-// Routes Middleware should not run on
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)", "/api/:path"],
 };

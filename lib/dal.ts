@@ -5,11 +5,32 @@ import { decrypt } from "@/lib/session";
 import { cache } from "react";
 import User from "@/lib/models/userModel";
 import { connect } from "@/lib/db";
-import { NextResponse } from "next/server";
+import SubscriptionPlan from "./models/subscriptionPlanModel";
 
 export const verifySession = cache(async () => {
   // Retrieve the 'session' cookie from the request headers
   const cookie = (await cookies()).get("session")?.value;
+
+  // If the cookie is not present, return a default session object
+  if (!cookie) {
+    return { isAuth: false, userId: "" }; // Not authenticated
+  }
+
+  // Decrypt the cookie to extract session details
+  const session = await decrypt(cookie);
+
+  // Return a session object with validated fields
+  return {
+    // Check if session.userId is a string
+    isAuth: Boolean(session && session.userId), // Ensure isAuth is a boolean
+    // Ensure userId is a string or default to an empty string
+    userId: typeof session?.userId === "string" ? session.userId : "",
+  };
+});
+
+export const verifyGuessSession = cache(async () => {
+  // Retrieve the 'session' cookie from the request headers
+  const cookie = (await cookies()).get("guessSession")?.value;
 
   // If the cookie is not present, return a default session object
   if (!cookie) {
@@ -21,26 +42,43 @@ export const verifySession = cache(async () => {
 
   // Return a session object with validated fields
   return {
-    isAuth: !!session, // Check if the session exists and is valid
-    userId: typeof session?.userId === "string" ? session.userId : "", // Ensure userId is a string or default to an empty string
+    isAuth: false,
+    role: session && session.role,
+    // Ensure userId is a string or default to an empty string
+    userId: typeof session?.userId === "string" ? session.userId : "",
   };
 });
 
 export const getUser = cache(async () => {
-  const session = await verifySession();
-
-  // Throw an error if the user is not authenticated
-  if (!session.isAuth || !session.userId) {
-    return null;
-  }
-
   try {
+    // Verify user session for authentication
+    const session = await verifySession();
+
+    if (!session.isAuth || !session.userId) {
+      // Return null if the user is not authenticated
+      return null;
+    }
+
+    // Establish database connection
     await connect();
 
-    const user = await User.findById(session.userId);
+    // Fetch user from the database and populate their subscription plan
+    const user = await User.findById(session.userId).populate({
+      path: "subscription.currentPlan", // Ensure this path matches your schema
+      model: SubscriptionPlan, // Reference the correct subscription plan model
+    });
 
-    return { user: user };
+    if (!user) {
+      // Return null if no user found
+      return null;
+    }
+
+    return user;
   } catch (error: any) {
-    console.error("Failed to fetch user", error);
+    // Log the error to identify issues
+    console.error("Failed to fetch user:", error.message);
+
+    // Return null in case of any unexpected error
+    return null;
   }
 });

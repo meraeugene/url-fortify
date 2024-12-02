@@ -8,6 +8,7 @@ import MiniLoader from "./MiniLoader";
 import MagicButton from "./MagicButton";
 import Link from "next/link";
 import { useToast } from "@/hooks/useToast";
+import Image from "next/image";
 
 const Pricings = ({ isAuth }: { isAuth: boolean }) => {
   const { country, loading } = useGeoLocationService();
@@ -54,9 +55,12 @@ const Pricings = ({ isAuth }: { isAuth: boolean }) => {
                 <div className="price__container  text-xl md:text-2xl font-bold">
                   {loading ? (
                     // Show loading spinner when data is loading
-                    <div className="flex items-center justify-center my-4">
-                      <MiniLoader />
-                    </div>
+                    <Image
+                      src="/loader.svg"
+                      width={30}
+                      height={30}
+                      alt="loader"
+                    />
                   ) : country ? (
                     // Once loading is done and country is available, display the price and yearly price
                     <div className="text-[#00ED82] flex items-center gap-1 ">

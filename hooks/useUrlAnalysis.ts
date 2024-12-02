@@ -3,42 +3,14 @@ import { useState } from "react";
 import { isValidUrl } from "../helpers/urlUtils";
 import { AnalysisData } from "@/types";
 import { useToast } from "@/hooks/useToast";
-
-const CACHE_EXPIRATION_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
+import { cacheData, getCachedData } from "@/helpers/cacheUtils";
 
 const useUrlAnalysis = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
+  const [scanLimitError, setScanLimitError] = useState<boolean>(false);
 
   const { toast } = useToast();
-
-  // Get cached data from sessionStorage
-  const getCachedData = (url: string): AnalysisData | null => {
-    try {
-      const cached = sessionStorage.getItem(url);
-      if (!cached) return null;
-
-      const { data, expiration } = JSON.parse(cached);
-
-      // If the cache is expired, return null
-      if (Date.now() > expiration) {
-        sessionStorage.removeItem(url); // Remove expired cache
-        return null;
-      }
-
-      return data;
-    } catch {
-      return null;
-    }
-  };
-
-  // Cache data in sessionStorage with expiration timestamp
-  const cacheData = (url: string, data: AnalysisData) => {
-    const expiration = Date.now() + CACHE_EXPIRATION_TIME;
-
-    const cachedData = { data, expiration };
-    sessionStorage.setItem(url, JSON.stringify(cachedData));
-  };
 
   const analyzeUrl = async (url: string) => {
     if (!isValidUrl(url)) {
@@ -54,29 +26,46 @@ const useUrlAnalysis = () => {
     // Check if cached data exists in sessionStorage
     const cachedAnalysisData = getCachedData(url);
     if (cachedAnalysisData) {
-      setAnalysisData(cachedAnalysisData); // Set the cached data to the state
+      setAnalysisData(cachedAnalysisData); // Use cached data
+      setScanLimitError(false); // Reset scan limit error
       toast({
         title: "URL Analysis Complete",
-        description: "Your website has been successfully analyzed.",
+        description: "The website has been successfully analyzed.",
       });
       return; // Skip the API call if cached data is available
     }
 
+    // Initialize loading state and reset errors
     setLoading(true);
-
-    let successMessage = "";
-
+    setScanLimitError(false);
     try {
-      // Start both API calls in parallel
+      // Define API endpoints
+      const captureUrl = `/api/proxy/capture?url=${encodeURIComponent(url)}`;
+      const reportUrl = `/api/proxy/virustotal?url=${encodeURIComponent(url)}`;
+
+      // Execute API calls in parallel
       const [captureResponse, reportResponse] = await Promise.all([
-        fetch(`/api/proxy/capture?url=${encodeURIComponent(url)}`, {
-          next: { revalidate: 60 * 60 * 24 }, // 24 hours
-        }),
-        fetch(`/api/proxy/virustotal?url=${encodeURIComponent(url)}`, {
-          next: { revalidate: 60 * 60 * 24 }, // 24 hours
-        }),
+        fetch(captureUrl, { next: { revalidate: 60 * 60 * 24 } }), // 24 hours
+        fetch(reportUrl, { next: { revalidate: 60 * 60 * 24 } }), // 24 hours
       ]);
 
+      // Process responses in parallel using Promise.all
+      const [captureData, reportData] = await Promise.all([
+        captureResponse.ok
+          ? captureResponse.json()
+          : Promise.reject(await captureResponse.json()),
+        reportResponse.ok
+          ? reportResponse.json()
+          : Promise.reject(await reportResponse.json()),
+      ]);
+
+      // Extract data from the responses
+      const { screenshot } = captureData;
+      const { data } = reportData;
+      const { categories, last_analysis_stats, last_analysis_results } =
+        data.attributes;
+
+      // Handle specific errors (e.g., timeouts)
       if (captureResponse.status === 504) {
         toast({
           title: "API Flash Service Timeout",
@@ -85,17 +74,6 @@ const useUrlAnalysis = () => {
         });
       }
 
-      if (!captureResponse.ok) {
-        const errorData = await captureResponse.json();
-        const errorMessage =
-          errorData?.message || "Failed to capture screenshot.";
-        throw new Error(errorMessage);
-      }
-
-      const captureData = await captureResponse.json();
-      const { screenshot } = captureData;
-
-      // Handle VirusTotal report response
       if (reportResponse.status === 504) {
         toast({
           title: "VirusTotal API Timeout",
@@ -104,23 +82,39 @@ const useUrlAnalysis = () => {
         });
       }
 
+      if (!captureResponse.ok) {
+        const errorData = await captureResponse.json();
+        throw new Error(errorData.message || "Failed to capture screenshot.");
+      }
+
       if (!reportResponse.ok) {
         const errorData = await reportResponse.json();
-        const errorMessage =
-          errorData?.message || "Failed to fetch VirusTotal report.";
-        throw new Error(errorMessage);
+        throw new Error(
+          errorData?.message || "Failed to fetch VirusTotal report."
+        );
       }
 
-      const reportData = await reportResponse.json();
-      const { message, data } = reportData;
+      // Perform scan limit validation
+      const scanLimitResponse = await fetch("/api/scan-limit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          captureStatus: captureResponse.status,
+          reportStatus: reportResponse.status,
+        }),
+      });
 
-      // If the message is success, save it in the variable
-      if (message === "URL Analysis Complete") {
-        successMessage = message;
+      if (!scanLimitResponse.ok) {
+        setScanLimitError(true); // Set error flag
+        const errorData = await scanLimitResponse.json();
+        throw new Error(
+          errorData?.message || "Failed to fetch Scan Limit API."
+        );
       }
 
-      const { categories, last_analysis_stats, last_analysis_results } =
-        data.attributes;
+      const scanLimitData = await scanLimitResponse.json();
+      const successMessage =
+        scanLimitData?.message || "Analysis was successful.";
 
       // Prepare data to be cached and set in state
       const analysisData: AnalysisData = {
@@ -133,6 +127,11 @@ const useUrlAnalysis = () => {
 
       setAnalysisData(analysisData);
       cacheData(url, analysisData); // Cache the new analysis data
+
+      toast({
+        title: "URL Analysis Complete",
+        description: successMessage || "Analysis was successful.",
+      });
     } catch (error: any) {
       console.log(error);
       toast({
@@ -141,16 +140,10 @@ const useUrlAnalysis = () => {
       });
     } finally {
       setLoading(false);
-      if (successMessage) {
-        toast({
-          title: successMessage,
-          description: "Your website has been successfully analyzed.",
-        });
-      }
     }
   };
 
-  return { analyzeUrl, analysisData, loading };
+  return { analyzeUrl, analysisData, loading, scanLimitError };
 };
 
 export default useUrlAnalysis;

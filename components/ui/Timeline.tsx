@@ -39,7 +39,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
           URL Analysis Complete
         </h2>
         <p className=" text-[#F8F8F8]  text-base max-w-sm">
-          Your website has been successfully analyzed. Here is the detailed
+          The website has been successfully analyzed. Here is the detailed
           report and screenshot of the results.
         </p>
       </div>
