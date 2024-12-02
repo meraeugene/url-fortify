@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+
 import { FiEdit2 } from "react-icons/fi";
 import { IoDiamondOutline, IoCloseOutline, IoArrowBack } from "react-icons/io5";
 import {
@@ -10,7 +11,9 @@ import { BiSupport } from "react-icons/bi";
 import { GiVibratingShield } from "react-icons/gi";
 import Image from "next/image";
 import Link from "next/link";
-import { getUser } from "@/lib/dal";
+import useSWR from "swr";
+import { fetcher } from "@/helpers/fetcher";
+import MiniLoader from "@/components/MiniLoader";
 
 const sections = [
   {
@@ -62,16 +65,22 @@ const sections = [
   },
 ];
 
-const Page = async () => {
-  const user = await getUser();
+const Page = () => {
+  const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
 
-  if (!user) {
+  if (isLoading)
     return (
       <div className="h-screen bg-black-100 flex items-center justify-center">
-        <h1 className="text-white text-xl">User not found. Please log in.</h1>
+        <MiniLoader />
       </div>
     );
-  }
+
+  if (error)
+    return (
+      <div className="h-screen bg-black-100 flex items-center justify-center">
+        <h1>failed to load</h1>
+      </div>
+    );
 
   const subscriptionPlan = user.subscription.currentPlan.title;
 

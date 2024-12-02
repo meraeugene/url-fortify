@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import mongoose from "mongoose";
+import SubscriptionPlan from "@/lib/models/subscriptionPlanModel";
 
 const region = process.env.AWS_S3_REGION;
 const bucketName = process.env.AWS_S3_BUCKET_NAME;
@@ -19,6 +20,49 @@ const s3Client = new S3Client({
     secretAccessKey: secretAccessKey!,
   },
 });
+
+export const GET = async () => {
+  try {
+    // Verify user session
+    const session = await verifySession();
+    if (!session.isAuth || !session.userId) {
+      return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
+        status: 401,
+      });
+    }
+
+    // Validate user ID format
+    if (!mongoose.Types.ObjectId.isValid(session.userId)) {
+      return new NextResponse(JSON.stringify({ message: "User not found" }), {
+        status: 404,
+      });
+    }
+
+    // Establish database connection
+    await connect();
+
+    // Fetch user from the database and populate their subscription plan
+    const user = await User.findById(session.userId).populate({
+      path: "subscription.currentPlan", // Ensure this path matches your schema
+      model: SubscriptionPlan, // Reference the correct subscription plan model
+    });
+
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    return new NextResponse(JSON.stringify(user), { status: 200 });
+  } catch (error: any) {
+    console.error("Error getting profile:", error);
+    return new NextResponse(
+      JSON.stringify({
+        message: error.message,
+        error: error.error,
+      }),
+      { status: 500 }
+    );
+  }
+};
 
 export const PATCH = async (request: Request) => {
   try {

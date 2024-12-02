@@ -8,19 +8,15 @@ const protectedRoutes = [
   "/account/overview",
   "/account/profile",
   "/account/usage",
-  "/purchase/offer/[offer]",
 ];
 const protectedAPIRoutes = ["/api/user"];
-const dynamicProtectedRoutes = [/^\/purchase\/offer\/[^\/]+$/]; // Regex for dynamic routes
 // const publicRoutes = ["/"];
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
   // Check if the current route matches a protected or public route
-  const isProtectedRoute =
-    protectedRoutes.includes(path) ||
-    dynamicProtectedRoutes.some((regex) => regex.test(path));
+  const isProtectedRoute = protectedRoutes.includes(path);
   const isProtectedAPIRoute = protectedAPIRoutes.includes(path);
 
   // const isPublicRoute = publicRoutes.includes(path);

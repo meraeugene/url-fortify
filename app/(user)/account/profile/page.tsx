@@ -1,17 +1,28 @@
+"use client";
+
 import { IoArrowBack } from "react-icons/io5";
 import Link from "next/link";
-import { getUser } from "@/lib/dal";
 import EditProfileForm from "@/components/ui/EditProfileForm";
+import useSWR from "swr";
+import { fetcher } from "@/helpers/fetcher";
+import MiniLoader from "@/components/MiniLoader";
 
-const Page = async () => {
-  const authenticatedUserData = await getUser();
+const Page = () => {
+  const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
 
-  // Parse the data before passing it to the client component
-  const parsedAuthenticatedUserData = JSON.parse(
-    JSON.stringify(authenticatedUserData)
-  );
+  if (isLoading)
+    return (
+      <div className="h-screen bg-black-100 flex items-center justify-center">
+        <MiniLoader />
+      </div>
+    );
 
-  const user = parsedAuthenticatedUserData || {};
+  if (error)
+    return (
+      <div className="h-screen bg-black-100 flex items-center justify-center">
+        <h1>failed to load</h1>
+      </div>
+    );
 
   return (
     <div className="bg-black-100 py-8 px-4 lg:py-10 h-screen md:flex md:items-center md:justify-center md:flex-col w-full">

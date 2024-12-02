@@ -63,10 +63,7 @@ export const getUser = cache(async () => {
     await connect();
 
     // Fetch user from the database and populate their subscription plan
-    const user = await User.findById(session.userId).populate({
-      path: "subscription.currentPlan", // Ensure this path matches your schema
-      model: SubscriptionPlan, // Reference the correct subscription plan model
-    });
+    const user = await User.findById(session.userId);
 
     if (!user) {
       // Return null if no user found

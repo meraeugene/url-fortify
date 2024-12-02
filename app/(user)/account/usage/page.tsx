@@ -1,27 +1,30 @@
+"use client";
+
 import Link from "next/link";
 import { IoArrowBack } from "react-icons/io5";
-import { getUser } from "@/lib/dal";
 import UsageChart from "@/components/UsageChart";
 import MagicButton from "@/components/MagicButton";
 import { PlanFeature } from "@/types";
+import useSWR from "swr";
+import { fetcher } from "@/helpers/fetcher";
+import MiniLoader from "@/components/MiniLoader";
 
-const page = async () => {
-  const authenticatedUserData = await getUser();
+const Page = () => {
+  const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
 
-  if (!authenticatedUserData) {
+  if (isLoading)
     return (
       <div className="h-screen bg-black-100 flex items-center justify-center">
-        <h1 className="text-white text-xl">User not found. Please log in.</h1>
+        <MiniLoader />
       </div>
     );
-  }
 
-  // Parse the data before passing it to the client component
-  const parsedAuthenticatedUserData = JSON.parse(
-    JSON.stringify(authenticatedUserData)
-  );
-
-  const user = parsedAuthenticatedUserData || {};
+  if (error)
+    return (
+      <div className="h-screen bg-black-100 flex items-center justify-center">
+        <h1>failed to load</h1>
+      </div>
+    );
 
   const { currentPlan } = user.subscription;
   const { usageStats } = user;
@@ -104,4 +107,4 @@ const page = async () => {
   );
 };
 
-export default page;
+export default Page;
