@@ -8,6 +8,14 @@ import { PlanFeature } from "@/types";
 const page = async () => {
   const authenticatedUserData = await getUser();
 
+  if (!authenticatedUserData) {
+    return (
+      <div className="h-screen bg-black-100 flex items-center justify-center">
+        <h1 className="text-white text-xl">User not found. Please log in.</h1>
+      </div>
+    );
+  }
+
   // Parse the data before passing it to the client component
   const parsedAuthenticatedUserData = JSON.parse(
     JSON.stringify(authenticatedUserData)
@@ -15,16 +23,8 @@ const page = async () => {
 
   const user = parsedAuthenticatedUserData || {};
 
-  // Safely access subscription and usage data
-  const subscription = user.subscription || {};
-  const usageStats = user.usageStats || {};
-  const currentPlan = subscription.currentPlan || {
-    title: "Free Plan",
-    features: [],
-    monthlyLookups: 0,
-  };
-
-  const monthlyLookupsUsed = usageStats.monthlyLookupsUsed ?? 0;
+  const { currentPlan } = user.subscription;
+  const { usageStats } = user;
 
   return (
     <div className="bg-black-100 py-8 px-4 lg:py-10 ">
@@ -73,13 +73,16 @@ const page = async () => {
                 <div className="mt-7 mb-3 px-5">
                   {/* Check if the user has reached the maximum usage limit */}
                   {
-                    monthlyLookupsUsed >= currentPlan.monthlyLookups ? (
+                    usageStats.monthlyLookupsUsed >=
+                    currentPlan.monthlyLookups ? (
                       <p className="text-red-500 text-sm mb-6">
                         You have reached your usage limit! <br /> Please upgrade
                         your plan for more lookups.
                       </p>
                     ) : /* If usage is nearing 80% of the limit, show a warning message */
-                    monthlyLookupsUsed / currentPlan.monthlyLookups >= 0.8 ? (
+                    usageStats.monthlyLookupsUsed /
+                        currentPlan.monthlyLookups >=
+                      0.8 ? (
                       <p className="text-yellow-300 text-sm mb-6">
                         You are approaching your usage limit! <br /> Consider
                         upgrading your plan for more lookups.

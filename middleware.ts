@@ -25,42 +25,47 @@ export default async function middleware(req: NextRequest) {
 
   // const isPublicRoute = publicRoutes.includes(path);
 
-  // Decrypt the session from the cookie
-  const cookie = (await cookies()).get("session")?.value;
-  const session = await decrypt(cookie);
+  try {
+    // Decrypt the session from the cookie
+    const cookie = (await cookies()).get("session")?.value;
+    const session = await decrypt(cookie);
 
-  // Decrypt the guess session from the cookie
-  const guessCookie = (await cookies()).get("guessSession")?.value;
-  const guessSession = await decrypt(guessCookie);
+    // Decrypt the guess session from the cookie
+    const guessCookie = (await cookies()).get("guessSession")?.value;
+    const guessSession = await decrypt(guessCookie);
 
-  // If the session and guess session does not exist, create one for guest users (only regenerate id if session is expired)
-  if (!session && !guessSession) {
-    await createGuessSession(`guest-${uuidv4()}`, "guest");
-  }
+    // If the session and guess session does not exist, create one for guest users (only regenerate id if session is expired)
+    if (!session && !guessSession) {
+      await createGuessSession(`guest-${uuidv4()}`, "guest");
+    }
 
-  if (isProtectedRoute && !session?.userId) {
-    // Redirect to / if the user is not authenticated for a protected route
+    if (isProtectedRoute && !session?.userId) {
+      // Redirect to / if the user is not authenticated for a protected route
+      return NextResponse.redirect(new URL("/", req.nextUrl));
+    }
+
+    // Protect API routes
+    if (isProtectedAPIRoute && !session?.userId) {
+      return NextResponse.json(
+        { message: "Not authorized, token failed" },
+        { status: 401 }
+      );
+    }
+
+    // Redirect to / if the user is authenticated but trying to access a public route (optional if u have log in / signup page)
+    // if (
+    //   isPublicRoute &&
+    //   session?.userId &&
+    //   !req.nextUrl.pathname.startsWith("/")
+    // ) {
+    //   return NextResponse.redirect(new URL("/", req.nextUrl));
+    // }
+
+    return NextResponse.next();
+  } catch (error) {
+    console.error("Middleware error:", error);
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
-
-  // Protect API routes
-  if (isProtectedAPIRoute && !session?.userId) {
-    return NextResponse.json(
-      { message: "Not authorized, token failed" },
-      { status: 401 }
-    );
-  }
-
-  // Redirect to / if the user is authenticated but trying to access a public route (optional if u have log in / signup page)
-  // if (
-  //   isPublicRoute &&
-  //   session?.userId &&
-  //   !req.nextUrl.pathname.startsWith("/")
-  // ) {
-  //   return NextResponse.redirect(new URL("/", req.nextUrl));
-  // }
-
-  return NextResponse.next();
 }
 
 export const config = {
