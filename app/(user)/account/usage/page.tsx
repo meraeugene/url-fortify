@@ -15,8 +15,14 @@ const page = async () => {
 
   const user = parsedAuthenticatedUserData || {};
 
-  const { currentPlan } = user.subscription;
-  const { usageStats } = user;
+  // Safely access subscription and usage data
+  const subscription = user.subscription || {};
+  const usageStats = user.usageStats || {};
+  const currentPlan = subscription.currentPlan || {
+    title: "Free Plan",
+    features: [],
+    monthlyLookups: 0,
+  };
 
   return (
     <div className="bg-black-100 py-8 px-4 lg:py-10 ">
