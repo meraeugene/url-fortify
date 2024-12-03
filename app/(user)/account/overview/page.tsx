@@ -79,6 +79,15 @@ const Page = async () => {
   // if (error) throw new Error("Error fetching user");
 
   const user = await getUser();
+
+  if (!user) {
+    return (
+      <div className="h-screen bg-black-100 flex items-center justify-center">
+        <h1 className="text-white text-xl">User not found. Please log in.</h1>
+      </div>
+    );
+  }
+
   const subscriptionPlan = user.subscription.currentPlan.title;
 
   // Filter sections based on subscription plan

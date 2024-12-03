@@ -22,6 +22,14 @@ const Page = async () => {
 
   const authenticatedUserData = await getUser();
 
+  if (!authenticatedUserData) {
+    return (
+      <div className="h-screen bg-black-100 flex items-center justify-center">
+        <h1 className="text-white text-xl">User not found. Please log in.</h1>
+      </div>
+    );
+  }
+
   const parsedAuthenticatedUserData = JSON.parse(
     JSON.stringify(authenticatedUserData)
   );
