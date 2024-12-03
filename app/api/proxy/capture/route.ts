@@ -43,9 +43,8 @@ export const GET = async (request: Request) => {
       scroll_page: true,
       response_type: "json",
       access_key: accessKey,
-      wait_until: "network_idle",
+      wait_until: "page_loaded",
       url,
-      delay: 5,
     };
 
     const urlWithParams = new URL(apiUrl);
