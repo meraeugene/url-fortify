@@ -1,40 +1,36 @@
-// "use client";
+"use client";
 
 import { IoArrowBack } from "react-icons/io5";
 import Link from "next/link";
 import EditProfileForm from "@/components/ui/EditProfileForm";
 import useSWR from "swr";
 import { fetcher } from "@/helpers/fetcher";
-import MiniLoader from "@/components/MiniLoader";
-import { getUser } from "@/lib/dal";
+import { Skeleton } from "@/components/ui/Skeleton";
 
-const Page = async () => {
-  // const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
+const Page = () => {
+  const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
 
-  // if (isLoading)
-  //   return (
-  //     <div className="h-screen bg-black-100 flex items-center justify-center">
-  //       <MiniLoader />
-  //     </div>
-  //   );
-
-  // if (error) throw new Error("Error fetching user");
-
-  const authenticatedUserData = await getUser();
-
-  if (!authenticatedUserData) {
+  if (isLoading)
     return (
-      <div className="h-screen bg-black-100 flex items-center justify-center">
-        <h1 className="text-white text-xl">User not found. Please log in.</h1>
+      <div className="bg-black-100 py-8 px-4 h-screen md:flex md:items-center md:justify-center md:flex-col w-full ">
+        <div className="w-full md:w-1/2 lg:w-[40%] xl:w-[30%] 2xl:w-[25%]">
+          <Skeleton className="bg-black-200 h-6 mb-6 md:h-8 rounded-none w-[15%]" />
+          <Skeleton className="bg-black-300 h-6 mb-6 md:mb-10 lg:mb-12 rounded-none w-1/2" />
+
+          <Skeleton className="bg-black-200 rounded-sm h-[85px] border-slate-800 w-full" />
+
+          <Skeleton className="bg-black-300 h-4 mt-6 rounded-none w-1/3" />
+          <Skeleton className="bg-black-200 h-8 mt-6 rounded-none w-full" />
+
+          <Skeleton className="bg-black-300 h-4 mt-6 rounded-none w-1/3" />
+          <Skeleton className="bg-black-200 h-8 mt-6 rounded-none w-full" />
+
+          <Skeleton className="bg-black-300 h-10 mt-6 rounded-none w-full" />
+        </div>
       </div>
     );
-  }
 
-  const parsedAuthenticatedUserData = JSON.parse(
-    JSON.stringify(authenticatedUserData)
-  );
-
-  const user = parsedAuthenticatedUserData || {};
+  if (error) throw new Error("Error fetching user");
 
   return (
     <div className="bg-black-100 py-8 px-4 lg:py-10 h-screen md:flex md:items-center md:justify-center md:flex-col w-full">

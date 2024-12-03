@@ -1,4 +1,4 @@
-// "use client"
+"use client";
 
 import { FiEdit2 } from "react-icons/fi";
 import { IoDiamondOutline, IoCloseOutline, IoArrowBack } from "react-icons/io5";
@@ -13,8 +13,7 @@ import Image from "next/image";
 import Link from "next/link";
 import useSWR from "swr";
 import { fetcher } from "@/helpers/fetcher";
-import MiniLoader from "@/components/MiniLoader";
-import { getUser } from "@/lib/dal";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 const sections = [
   {
@@ -66,27 +65,34 @@ const sections = [
   },
 ];
 
-const Page = async () => {
-  // const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
+const Page = () => {
+  const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
 
-  // if (isLoading)
-  //   return (
-  //     <div className="h-screen bg-black-100 flex items-center justify-center">
-  //       <MiniLoader />
-  //     </div>
-  //   );
+  const array = new Array(6).fill(null);
 
-  // if (error) throw new Error("Error fetching user");
-
-  const user = await getUser();
-
-  if (!user) {
+  if (isLoading)
     return (
-      <div className="h-screen bg-black-100 flex items-center justify-center">
-        <h1 className="text-white text-xl">User not found. Please log in.</h1>
+      <div className="bg-black-100 py-8 px-4">
+        <div className=" md:max-w-xl  lg:max-w-[60vw] xl:max-w-[40vw] 2xl:max-w-[35vw] md:mx-auto md:justify-center md:items-center ">
+          <Skeleton className="bg-black-300 h-6 md:h-8 md:w-[10%] mb-6 rounded-none w-[15%]" />
+          <Skeleton className="bg-black-300 h-6 mb-6 rounded-none w-1/2" />
+          <div className="grid grid-cols-1 gap-4 w-full">
+            {array.map((_, index) => (
+              <Skeleton
+                key={index}
+                className="text-white rounded-md pt-4 h-32 pb-6 px-4 bg-black-200 border-slate-800 border w-full"
+              >
+                <Skeleton className="bg-black-300 h-6 mb-6 rounded-none" />
+                <Skeleton className="bg-black-300 h-4 mb-3 rounded-none" />
+                <Skeleton className="bg-black-300 h-4 rounded-none" />
+              </Skeleton>
+            ))}
+          </div>
+        </div>
       </div>
     );
-  }
+
+  if (error) throw new Error("Error fetching user");
 
   const subscriptionPlan = user.subscription.currentPlan.title;
 
