@@ -118,3 +118,12 @@ export interface AuthenticatedUserData {
   subscription: Subscription; // User's subscription details
   usageStats: UsageStats; // User's usage statistics
 }
+
+export interface Plan {
+  id: number;
+  offer: string;
+  price: number;
+  title: string;
+  desc: string;
+  features: string[];
+}

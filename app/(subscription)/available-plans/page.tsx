@@ -7,6 +7,7 @@ import useGeoLocationService from "@/hooks/useGeoLocation";
 import { formattedPrice } from "@/helpers/pricingUtils";
 import MagicButton from "@/components/MagicButton";
 import Image from "next/image";
+import { Plan } from "@/types";
 
 const Page = () => {
   const { country, loading } = useGeoLocationService();
@@ -14,6 +15,12 @@ const Page = () => {
   const filteredSubscriptionPlans = pricingPlans.filter(
     (plan) => plan.title !== "Free Plan"
   );
+
+  const handleCheckoutSubscription = (plan: Plan) => {
+    console.log(plan);
+    try {
+    } catch (error) {}
+  };
 
   return (
     <div className="bg-black-100 py-8 px-4 lg:py-10 lg:h-screen lg:flex lg:flex-col lg:items-center lg:justify-center ">
@@ -88,14 +95,14 @@ const Page = () => {
 
                   <div className="mt-7 mb-3 w-full">
                     {pricingPlan.title !== "Free Plan" && (
-                      <Link
-                        href={`/purchase/offer/${pricingPlan.offer}/?country=${country}`}
+                      <div
+                        onClick={() => handleCheckoutSubscription(pricingPlan)}
                       >
                         <MagicButton
                           title={`Get ${pricingPlan.title}`}
                           position="right"
                         />
-                      </Link>
+                      </div>
                     )}
                   </div>
                 </div>

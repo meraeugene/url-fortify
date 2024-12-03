@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import Link from "next/link";
 import { IoArrowBack } from "react-icons/io5";
@@ -8,23 +8,27 @@ import { PlanFeature } from "@/types";
 import useSWR from "swr";
 import { fetcher } from "@/helpers/fetcher";
 import MiniLoader from "@/components/MiniLoader";
+import { getUser } from "@/lib/dal";
 
-const Page = () => {
-  const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
+const Page = async () => {
+  // const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
 
-  if (isLoading)
-    return (
-      <div className="h-screen bg-black-100 flex items-center justify-center">
-        <MiniLoader />
-      </div>
-    );
+  // if (isLoading)
+  //   return (
+  //     <div className="h-screen bg-black-100 flex items-center justify-center">
+  //       <MiniLoader />
+  //     </div>
+  //   );
 
-  if (error)
-    return (
-      <div className="h-screen bg-black-100 flex items-center justify-center">
-        <h1>failed to load</h1>
-      </div>
-    );
+  // if (error) throw new Error("Error fetching user");
+
+  const authenticatedUserData = await getUser();
+
+  const parsedAuthenticatedUserData = JSON.parse(
+    JSON.stringify(authenticatedUserData)
+  );
+
+  const user = parsedAuthenticatedUserData || {};
 
   const { currentPlan } = user.subscription;
   const { usageStats } = user;
