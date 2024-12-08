@@ -29,7 +29,7 @@ const Page = () => {
     fetcher,
     {
       revalidateIfStale: true,
-      revalidateOnFocus: true,
+      refreshInterval: 1000,
     }
   );
 

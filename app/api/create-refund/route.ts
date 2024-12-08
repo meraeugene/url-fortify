@@ -31,7 +31,7 @@ export const POST = async (request: Request) => {
           description:
             "Your refund request has been successfully processed. Please allow a moment for the update to reflect.",
         },
-        redirect_url: "/account/order-history",
+        redirect_url: "/account/overview",
         refundSession,
       }),
       {
