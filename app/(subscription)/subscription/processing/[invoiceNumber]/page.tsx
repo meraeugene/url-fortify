@@ -14,7 +14,7 @@ const Page = () => {
       const timer = setTimeout(() => {
         // Redirect to success page with invoiceNumber
         router.push(`/subscription/success/${params.invoiceNumber}`);
-      }, 20000); // Adjust the delay as needed
+      }, 10000); // Adjust the delay as needed
 
       // Cleanup timer when the component is unmounted
       return () => clearTimeout(timer);
