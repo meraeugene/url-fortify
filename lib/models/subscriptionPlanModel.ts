@@ -6,19 +6,24 @@ interface Feature {
   value: string | number | boolean;
 }
 
-interface SubscriptionPlan extends Document {
+interface ISubscriptionPlan extends Document {
   title: string;
-  monthlyLookups: number; // Max scans per month for this plan
+  intendedUsers: string;
+  maxLookups: number; // Max scans per month for this plan
   features: Feature[];
   price: number; // Stored in cents for accuracy
 }
 
-const SubscriptionPlanSchema = new Schema<SubscriptionPlan>({
+const SubscriptionPlanSchema = new Schema<ISubscriptionPlan>({
   title: {
     type: String,
     required: true,
   },
-  monthlyLookups: {
+  intendedUsers: {
+    type: String,
+    required: true,
+  },
+  maxLookups: {
     type: Number,
     required: true,
   },
@@ -46,6 +51,6 @@ const SubscriptionPlanSchema = new Schema<SubscriptionPlan>({
 
 const SubscriptionPlan =
   models?.SubscriptionPlan ||
-  model<SubscriptionPlan>("SubscriptionPlan", SubscriptionPlanSchema);
+  model<ISubscriptionPlan>("SubscriptionPlan", SubscriptionPlanSchema);
 
 export default SubscriptionPlan;

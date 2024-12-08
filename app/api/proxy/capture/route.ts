@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
+import { verifyGuessSession, verifySession } from "@/lib/dal";
+import { connect } from "@/lib/db";
+import SubscriptionPlan from "@/lib/models/subscriptionPlanModel";
+import User from "@/lib/models/userModel";
 
-// API FLASH - Screenshot Capture Route
+// @desc API FLASH - Screenshot Capture Route
+// @route GET /api/proxy/capture
+// @access Public
 export const GET = async (request: Request) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -35,6 +41,49 @@ export const GET = async (request: Request) => {
         { status: 401 } // 401 Unauthorized for missing API key
       );
     }
+
+    // let fullPage = false;
+
+    // // Verify user session
+    // const session = await verifySession();
+    // // Verify the guest session details
+    // const guessSession = await verifyGuessSession();
+
+    // // If it's a guest session, fullPage should be false
+    // if (
+    //   guessSession.userId.startsWith("guest-") &&
+    //   guessSession.role === "guest"
+    // ) {
+    //   fullPage = false;
+    // }
+
+    // For authenticated users, check subscription plan
+    // if (session.isAuth && session.userId) {
+    //   await connect();
+
+    //   const user = await User.findById(session.userId);
+    //   if (!user) {
+    //     return NextResponse.json(
+    //       { message: "User not found" },
+    //       { status: 404 }
+    //     );
+    //   }
+
+    //   const freePlan = await SubscriptionPlan.findOne({
+    //     title: "Fortify Free",
+    //   });
+    //   if (!freePlan) {
+    //     return NextResponse.json(
+    //       { message: "Fortify Free not found." },
+    //       { status: 404 }
+    //     );
+    //   }
+
+    //   // Set fullPage based on user plan if its "Fortify Free" set it to false otherwise true
+    //   // Correct comparison: Use .toString() to compare ObjectIds by their string representation
+    //   fullPage =
+    //     user.subscription.currentPlan.toString() !== freePlan._id.toString();
+    // }
 
     const params = {
       format: "webp",

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
-// OCR Optical character recognition - Image to Text Feature Route
+// @desc OCR Optical character recognition - Image to Text Feature Route
+// @route GET /api/proxy/ocr
+// @access Public
 export const POST = async (request: Request) => {
   try {
     const formData = await request.formData();

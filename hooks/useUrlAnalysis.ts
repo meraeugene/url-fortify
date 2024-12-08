@@ -3,7 +3,6 @@ import { useState } from "react";
 import { isValidUrl } from "../helpers/urlUtils";
 import { AnalysisData } from "@/types";
 import { useToast } from "@/hooks/useToast";
-import { cacheData, getCachedData } from "@/helpers/cacheUtils";
 
 const useUrlAnalysis = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -21,18 +20,6 @@ const useUrlAnalysis = () => {
         variant: "destructive",
       });
       return;
-    }
-
-    // Check if cached data exists in sessionStorage
-    const cachedAnalysisData = getCachedData(url);
-    if (cachedAnalysisData) {
-      setAnalysisData(cachedAnalysisData); // Use cached data
-      setScanLimitError(false); // Reset scan limit error
-      toast({
-        title: "URL Analysis Complete",
-        description: "The website has been successfully analyzed.",
-      });
-      return; // Skip the API call if cached data is available
     }
 
     // Initialize loading state and reset errors
@@ -126,7 +113,6 @@ const useUrlAnalysis = () => {
       };
 
       setAnalysisData(analysisData);
-      cacheData(url, analysisData); // Cache the new analysis data
 
       toast({
         title: "URL Analysis Complete",

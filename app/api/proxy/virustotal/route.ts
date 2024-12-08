@@ -1,6 +1,9 @@
 import { base64EncodeUrl } from "@/helpers/urlUtils";
 import { NextResponse } from "next/server";
 
+// @desc Virust Total
+// @route GET /api/proxy/virustotal
+// @access Public
 export const GET = async (request: Request) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -55,6 +58,8 @@ export const GET = async (request: Request) => {
         { status: 502 } // 502 Bad Gateway is more appropriate for external service issues
       );
     }
+
+    // if no user (guest user) or user plan is "Fortify Free" dont return the const { categories, last_analysis_stats, last_analysis_results } = data.attributes;
 
     const data = await response.json();
 

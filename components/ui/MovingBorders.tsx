@@ -35,7 +35,7 @@ export function InteractiveDiv({
     <Component
       className={cn(
         // remove h-16 w-40, add  md:col-span-2
-        `bg-transparent relative text-xl p-[1px] w-[80%] md:w-fit lg:w-full  overflow-hidden md:col-span-1 md:row-span-1 ${otherClasses}`,
+        `bg-transparent  relative text-xl p-[1px] w-[80%]  lg:w-full  overflow-hidden md:col-span-1 md:row-span-1 ${otherClasses}`,
         containerClassName
       )}
       style={{

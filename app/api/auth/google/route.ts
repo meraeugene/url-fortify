@@ -1,5 +1,4 @@
 import { login } from "@/app/actions/auth";
-import { getUser } from "@/lib/dal";
 import { NextResponse } from "next/server";
 
 // @desc Login user

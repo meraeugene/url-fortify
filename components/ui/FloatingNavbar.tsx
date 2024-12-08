@@ -22,7 +22,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/DropdownMenu";
-import { useUserStore } from "@/stores/useUserStore";
 
 type FloatingNavProps = {
   navItems: {
@@ -43,7 +42,8 @@ export const FloatingNav = ({
 }: FloatingNavProps) => {
   const { scrollYProgress } = useScroll();
 
-  // set true for the initial state so that nav bar is visible in the hero section
+  const router = useRouter();
+  const { toast } = useToast();
   const [visible, setVisible] = useState(true);
 
   // Hide navbar after 1 seconds
@@ -78,8 +78,6 @@ export const FloatingNav = ({
   const user = authenticatedUserData || {};
 
   // GOOGLE AUTH
-  const router = useRouter();
-  const { toast } = useToast();
 
   // Loader state
   const [loading, setLoading] = useState(false);

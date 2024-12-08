@@ -8,12 +8,12 @@ interface UsageProgressProps {
 }
 
 const UsageProgress = ({ user }: UsageProgressProps) => {
-  const { monthlyLookupsUsed } = user.usageStats;
-  const { monthlyLookups: monthlyUsageLimit } = user.subscription.currentPlan;
+  const { maxLookupsUsed } = user.usageStats;
+  const { maxLookups } = user.subscription.currentPlan;
 
   // Calculate usage percentage
-  const usagePercentage = monthlyUsageLimit
-    ? Math.min((monthlyLookupsUsed / monthlyUsageLimit) * 100, 100) // Cap at 100%
+  const usagePercentage = maxLookups
+    ? Math.min((maxLookupsUsed / maxLookups) * 100, 100) // Cap at 100%
     : 0; // Handle cases where the limit might not be set
 
   // Determine the color based on usage percentage
@@ -27,7 +27,7 @@ const UsageProgress = ({ user }: UsageProgressProps) => {
     <div className="space-y-2 mt-4">
       <div className="flex justify-between text-sm">
         <span>
-          Usage: {monthlyLookupsUsed}/{monthlyUsageLimit}
+          Usage: {maxLookupsUsed}/{maxLookups}
         </span>
         <span>{Math.round(usagePercentage)}%</span>
       </div>

@@ -24,8 +24,8 @@ interface UsageChartProps {
 }
 
 const UsageChart = ({ user }: UsageChartProps) => {
-  const monthlyLookupsUsed = user.usageStats.monthlyLookupsUsed;
-  const monthlyUsageLimit = user.subscription.currentPlan.monthlyLookups;
+  const monthlyLookupsUsed = user.usageStats.maxLookupsUsed;
+  const monthlyUsageLimit = user.subscription.currentPlan.maxLookups;
 
   // Get the current month name
   const currentMonth = new Date().toLocaleString("default", { month: "long" });

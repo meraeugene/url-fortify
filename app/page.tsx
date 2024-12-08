@@ -19,14 +19,17 @@ const Home = async () => {
 
   return (
     <main className="relative bg-black-100 flex justify-center items-center flex-col overflow-clip mx-auto sm:px-10 px-5">
-      <div className="max-w-7xl w-full">
+      <div className="max-w-[85rem] w-full">
         <FloatingNav
           isAuth={isAuth}
           navItems={navItems}
           authenticatedUserData={parsedAuthenticatedUserData}
         />
-        <Hero />
-        <Pricings isAuth={isAuth} />
+        <Hero authenticatedUserData={parsedAuthenticatedUserData} />
+        <Pricings
+          isAuth={isAuth}
+          authenticatedUserData={parsedAuthenticatedUserData}
+        />
         <Clients />
         <Footer />
       </div>

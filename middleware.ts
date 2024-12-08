@@ -8,8 +8,20 @@ const protectedRoutes = [
   "/account/overview",
   "/account/profile",
   "/account/usage",
+  "/account/order-history",
+  "/account/refund",
+  "/account/manage-your-plan",
+  "/account/order-history",
+  "/available-plans",
+  "/subscription/success",
 ];
-const protectedAPIRoutes = ["/api/user"];
+const protectedAPIRoutes = [
+  "/api/user",
+  "/api/user/payment",
+  "/api/auth/logout",
+  "/api/checkout",
+  "/api/create-refund",
+];
 // const publicRoutes = ["/"];
 
 export default async function middleware(req: NextRequest) {
@@ -60,5 +72,11 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)", "/api/:path"],
+  // Define which routes the middleware should apply to
+  matcher: [
+    // First pattern: Match all routes except the specified exclusions
+    "/((?!api|_next/static|_next/image|.*\\.png$).*)", // Exclude API routes, static assets, image routes, and PNG files
+    "/api/:path", // Include all API routes (e.g., /api/user, /api/products)
+    "/api/auth/logout",
+  ],
 };

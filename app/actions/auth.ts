@@ -4,7 +4,7 @@ import User from "@/lib/models/userModel";
 import { UserData } from "@/types";
 import SubscriptionPlan from "@/lib/models/subscriptionPlanModel";
 
-export async function login(userData: UserData) {
+export const login = async (userData: UserData) => {
   const { fullName, email, image } = userData;
 
   // Ensure all required fields (full name, email, and profile image) are provided
@@ -16,12 +16,12 @@ export async function login(userData: UserData) {
   // Connect to the database
   await connect();
 
-  // Try to find the 'Free Plan' from the PricingPlan collection
-  const freePlan = await SubscriptionPlan.findOne({ title: "Free Plan" });
+  // Try to find the 'Fortify Free' from the PricingPlan collection
+  const freePlan = await SubscriptionPlan.findOne({ title: "Fortify Free" });
 
-  // If the 'Free Plan' doesn't exist, throw an error
+  // If the 'Fortify Free' doesn't exist, throw an error
   if (!freePlan) {
-    throw new Error("Free plan not found.");
+    throw new Error("Fortify Free not found.");
   }
 
   // Search for an existing user by email
@@ -42,8 +42,8 @@ export async function login(userData: UserData) {
   }
 
   await createSession(user._id);
-}
+};
 
-export async function logout() {
+export const logout = async () => {
   await deleteSession();
-}
+};

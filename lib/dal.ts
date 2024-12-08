@@ -5,7 +5,8 @@ import { decrypt } from "@/lib/session";
 import { cache } from "react";
 import User from "@/lib/models/userModel";
 import { connect } from "@/lib/db";
-import SubscriptionPlan from "./models/subscriptionPlanModel";
+import Payment from "@/lib/models/paymentModel";
+import SubscriptionPlan from "@/lib/models/subscriptionPlanModel";
 
 export const verifySession = cache(async () => {
   // Retrieve the 'session' cookie from the request headers
@@ -63,10 +64,19 @@ export const getUser = cache(async () => {
     await connect();
 
     // Fetch user from the database and populate their subscription plan
-    const user = await User.findById(session.userId).populate({
-      path: "subscription.currentPlan",
-      model: SubscriptionPlan,
-    });
+    const user = await User.findById(session.userId)
+      .populate({
+        path: "subscription.currentPlan",
+        model: SubscriptionPlan,
+        select: "title features maxLookups", // Only select specific fields, e.g., title and price
+      })
+      .populate({
+        path: "payments", // Populate payments array
+        select: "amount status paidAt paymentId invoiceNumber paymentMethod", // Select the fields you need from Payment
+        model: Payment,
+        options: { sort: { paidAt: -1 }, limit: 1 }, // Sort and limit to the latest payment
+      })
+      .exec();
 
     if (!user) {
       // Return null if no user found
@@ -76,7 +86,7 @@ export const getUser = cache(async () => {
     return user;
   } catch (error: any) {
     // Log the error to identify issues
-    console.error("Failed to fetch user:", error.message);
+    console.log("Failed to fetch user:", error.message);
 
     // Return null in case of any unexpected error
     return null;

@@ -3,10 +3,13 @@ import { connect } from "@/lib/db";
 import {
   handleGuestUserScanLimit,
   handleAuthenticatedUserScanLimit,
-} from "@/helpers/scanLimitHelpers";
+} from "@/app/actions/scanLimit";
 import { NextResponse } from "next/server";
 import URLScanRecord from "@/lib/models/urlScanRecordModel";
 
+// @desc Check scan limit
+// @route POST /api/scan-limit
+// @access Public
 export const POST = async (request: Request) => {
   try {
     await connect();

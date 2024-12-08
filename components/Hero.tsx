@@ -16,6 +16,7 @@ import { a11yProps, CustomTabPanel } from "./MUI";
 import { isValidImageFile } from "@/helpers/fileUtils";
 import { extractUrl, formatUrl, trimUrl } from "@/helpers/urlUtils";
 import { useToast } from "@/hooks/useToast";
+import { AuthenticatedUserData } from "@/types";
 
 const theme = createTheme({
   palette: {
@@ -26,7 +27,11 @@ const theme = createTheme({
   },
 });
 
-const Hero = () => {
+type HeroProps = {
+  authenticatedUserData: AuthenticatedUserData;
+};
+
+const Hero = ({ authenticatedUserData }: HeroProps) => {
   const [url, setUrl] = useState<string>("");
   const { analyzeUrl, analysisData, loading, scanLimitError } =
     useUrlAnalysis();

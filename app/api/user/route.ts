@@ -1,11 +1,10 @@
-import { verifySession } from "@/lib/dal";
+import { getUser, verifySession } from "@/lib/dal";
 import { connect } from "@/lib/db";
 import User from "@/lib/models/userModel";
 import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import mongoose from "mongoose";
-import SubscriptionPlan from "@/lib/models/subscriptionPlanModel";
 
 const region = process.env.AWS_S3_REGION;
 const bucketName = process.env.AWS_S3_BUCKET_NAME;
@@ -21,34 +20,17 @@ const s3Client = new S3Client({
   },
 });
 
+// @desc Get user profile
+// @route GET /api/user
+// @access Private
 export const GET = async () => {
   try {
-    // Verify user session
-    const session = await verifySession();
-    if (!session.isAuth || !session.userId) {
-      return new NextResponse(JSON.stringify({ message: "Unauthorized" }), {
-        status: 401,
-      });
-    }
+    const user = await getUser();
 
-    // Validate user ID format
-    if (!mongoose.Types.ObjectId.isValid(session.userId)) {
+    if (!user) {
       return new NextResponse(JSON.stringify({ message: "User not found" }), {
         status: 404,
       });
-    }
-
-    // Establish database connection
-    await connect();
-
-    // Fetch user from the database and populate their subscription plan
-    const user = await User.findById(session.userId).populate({
-      path: "subscription.currentPlan", // Ensure this path matches your schema
-      model: SubscriptionPlan, // Reference the correct subscription plan model
-    });
-
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
     return new NextResponse(JSON.stringify(user), { status: 200 });
@@ -64,6 +46,9 @@ export const GET = async () => {
   }
 };
 
+// @desc Update user profile
+// @route PATCH /api/user
+// @access Private
 export const PATCH = async (request: Request) => {
   try {
     // Verify user session

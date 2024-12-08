@@ -6,15 +6,15 @@ import { cookies } from "next/headers";
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
 
-export async function encrypt(payload: any) {
+export const encrypt = async (payload: any) => {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("1d")
     .sign(encodedKey);
-}
+};
 
-export async function decrypt(session: string | undefined = "") {
+export const decrypt = async (session: string | undefined = "") => {
   try {
     const { payload } = await jwtVerify(session, encodedKey, {
       algorithms: ["HS256"],
@@ -23,10 +23,12 @@ export async function decrypt(session: string | undefined = "") {
   } catch (error) {
     console.log("User is not authenticated");
   }
-}
+};
 
-export async function createSession(userId: string) {
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+export const createSession = async (userId: string) => {
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 1 day in milliseconds
+  // const expiresAt = new Date(Date.now() + 30 * 1000); // 30 seconds
+
   const session = await encrypt({ userId, expiresAt });
 
   const cookieStore = await cookies();
@@ -37,9 +39,10 @@ export async function createSession(userId: string) {
     sameSite: "lax",
     path: "/",
   });
-}
-export async function createGuessSession(userId: string, role: string) {
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+};
+export const createGuessSession = async (userId: string, role: string) => {
+  // Set expiration to 1 month (30 days)
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days in milliseconds
   const session = await encrypt({ userId, expiresAt, role });
 
   const cookieStore = await cookies();
@@ -50,9 +53,9 @@ export async function createGuessSession(userId: string, role: string) {
     sameSite: "lax",
     path: "/",
   });
-}
+};
 
-export async function updateSession() {
+export const updateSession = async () => {
   const session = (await cookies()).get("session")?.value;
   const payload = await decrypt(session);
 
@@ -70,9 +73,9 @@ export async function updateSession() {
     sameSite: "lax",
     path: "/",
   });
-}
+};
 
-export async function deleteSession() {
+export const deleteSession = async () => {
   const cookieStore = await cookies();
   cookieStore.delete("session");
-}
+};

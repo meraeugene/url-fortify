@@ -2,13 +2,25 @@
 
 import { IoArrowBack } from "react-icons/io5";
 import Link from "next/link";
-import EditProfileForm from "@/components/ui/EditProfileForm";
+import EditProfileForm from "@/components/EditProfileForm";
 import useSWR from "swr";
 import { fetcher } from "@/helpers/fetcher";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { RiErrorWarningLine } from "react-icons/ri";
 
 const Page = () => {
   const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
+
+  if (error) {
+    return (
+      <div className=" h-screen flex flex-col items-center justify-center text-center font-medium   ">
+        <div className="border-red-500 border rounded-sm  text-red-500 py-2 px-4 text-xl flex items-center justify-center gap-2">
+          <RiErrorWarningLine />
+          <p>{error.response.data.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading)
     return (
@@ -29,8 +41,6 @@ const Page = () => {
         </div>
       </div>
     );
-
-  if (error) throw new Error("Error fetching user");
 
   return (
     <div className="bg-black-100 py-8 px-4 lg:py-10 h-screen md:flex md:items-center md:justify-center md:flex-col w-full">

@@ -8,9 +8,22 @@ import { PlanFeature } from "@/types";
 import useSWR from "swr";
 import { fetcher } from "@/helpers/fetcher";
 import { Skeleton } from "@/components/ui/Skeleton";
+import Image from "next/image";
+import { RiErrorWarningLine } from "react-icons/ri";
 
 const Page = () => {
   const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
+
+  if (error) {
+    return (
+      <div className=" h-screen flex flex-col items-center justify-center text-center  font-medium    ">
+        <div className="border-red-500 border rounded-sm  text-red-500 py-2 px-4 text-xl flex items-center justify-center gap-2">
+          <RiErrorWarningLine />
+          <p>{error.response.data.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading)
     return (
@@ -25,8 +38,6 @@ const Page = () => {
         </div>
       </div>
     );
-
-  if (error) throw new Error("Error fetching user");
 
   const { currentPlan } = user.subscription;
   const { usageStats } = user;
@@ -59,48 +70,46 @@ const Page = () => {
             }}
             className="flex-1 text-white border-slate-800 border rounded-sm lg:w-1/2"
           >
-            <div className="flex flex-col text-start w-full   py-5 gap-8">
-              <div>
-                <h1 className="text-[#00ED82]  mb-2 text-xl md:text-2xl px-5 font-bold">
-                  {currentPlan.title}
-                </h1>
+            <div className="text-green-400 flex items-center justify-between bg-gray-900 bg-opacity-40 backdrop-blur-lg backdrop-filter py-2 text-xl md:text-2xl px-5 pr-0 font-bold ">
+              <h1>{currentPlan.title}</h1>
 
-                <div className="w-full h-[1px] my-4 bg-[#252f3f]" />
+              <Image
+                width={70}
+                height={70}
+                src="/url-fortify-logo.png"
+                alt="logo"
+              />
+            </div>
 
-                <ul className="list-disc px-5 ml-5 flex flex-col gap-3">
-                  {currentPlan.features.map((feature: PlanFeature) => (
-                    <li className="text-base text-white-100 " key={feature._id}>
-                      {feature.value} {feature.name}
-                    </li>
-                  ))}
-                </ul>
+            <ul className="list-disc  py-5 px-5 ml-5 flex flex-col gap-3">
+              {currentPlan.features.map((feature: PlanFeature) => (
+                <li className="text-base text-white-100 " key={feature._id}>
+                  {feature.value} {feature.name}
+                </li>
+              ))}
+            </ul>
 
-                <div className="mt-7 mb-3 px-5">
-                  {/* Check if the user has reached the maximum usage limit */}
-                  {
-                    usageStats.monthlyLookupsUsed >=
-                    currentPlan.monthlyLookups ? (
-                      <p className="text-red-500 text-sm mb-6">
-                        You have reached your usage limit! <br /> Please upgrade
-                        your plan for more lookups.
-                      </p>
-                    ) : /* If usage is nearing 80% of the limit, show a warning message */
-                    usageStats.monthlyLookupsUsed /
-                        currentPlan.monthlyLookups >=
-                      0.8 ? (
-                      <p className="text-yellow-300 text-sm mb-6">
-                        You are approaching your usage limit! <br /> Consider
-                        upgrading your plan for more lookups.
-                      </p>
-                    ) : null /* If neither condition is met, do not show any message */
-                  }
+            <div className="px-5 pb-5">
+              {/* Check if the user has reached the maximum usage limit */}
+              {
+                usageStats.maxLookupsUsed >= currentPlan.maxLookups ? (
+                  <p className="text-red-500 text-sm mb-6">
+                    You have reached your usage limit! <br /> Please upgrade
+                    your plan for more lookups.
+                  </p>
+                ) : /* If usage is nearing 80% of the limit, show a warning message */
+                usageStats.maxLookupsUsed / currentPlan.maxLookups >= 0.8 ? (
+                  <p className="text-yellow-300 text-sm mb-6">
+                    You are nearing your usage limit! <br />
+                    Please Upgrade for more lookups.
+                  </p>
+                ) : null /* If neither condition is met, do not show any message */
+              }
 
-                  {/* Provide a button for upgrading the plan */}
-                  <Link href={`/available-plans`}>
-                    <MagicButton title="Upgrade Plan" position="right" />
-                  </Link>
-                </div>
-              </div>
+              {/* Provide a button for upgrading the plan */}
+              <Link href={`/available-plans`}>
+                <MagicButton title="Upgrade Plan" position="right" />
+              </Link>
             </div>
           </div>
         </div>

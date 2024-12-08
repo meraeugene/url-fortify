@@ -88,14 +88,19 @@ export interface Session {
 export interface Subscription {
   currentPlan: CurrentPlan;
   status: string; // Example: 'active' | 'inactive'
+  paymentId: string | null; // Payment ID for the current subscription
+  paymentMethod: string | null;
+  invoiceNumber: string | null;
+  paidAt: number | null;
 }
 
 export interface CurrentPlan {
   features: PlanFeature[];
-  monthlyLookups: number;
+  maxLookups: number;
   price: number;
   title: string;
   _id: string; // MongoDB ObjectId as a string
+  intendedUsers: string;
 }
 
 export interface PlanFeature {
@@ -104,9 +109,20 @@ export interface PlanFeature {
   _id: string; // MongoDB ObjectId as a string
 }
 
+export interface Payments {
+  userId: string; // Reference to User
+  paymentId: string; // Unique payment ID (from a payment gateway)
+  invoiceNumber: string; // Invoice number for the payment
+  paymentMethod: string; // Payment method (e.g., gcash, paymaya)
+  paidAt: number; // Date when the payment was made
+  amount: number; // Total amount paid
+  status: "paid" | "refunded" | "failed"; // Total amount paid
+  plan: string; // Reference to the Plan
+}
+
 export interface UsageStats {
   lastResetDate: Date; // Date type to handle timestamp
-  monthlyLookupsUsed: number; // Tracks usage for the current month
+  maxLookupsUsed: number; // Tracks usage for the current month
 }
 
 export interface AuthenticatedUserData {
@@ -117,13 +133,15 @@ export interface AuthenticatedUserData {
   role: "user" | "admin"; // User's role
   subscription: Subscription; // User's subscription details
   usageStats: UsageStats; // User's usage statistics
+  payments: Payments;
 }
 
 export interface Plan {
-  id: number;
+  _id: number;
   offer: string;
   price: number;
   title: string;
-  desc: string;
-  features: string[];
+  maxLookups: number;
+  features: PlanFeature[];
+  intendedUsers: string;
 }

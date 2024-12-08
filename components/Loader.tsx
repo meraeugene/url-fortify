@@ -5,6 +5,9 @@ import { MultiStepLoader as Loader } from "./ui/MultiStepLoader";
 
 const loadingStates = [
   {
+    text: "Analyzing the provided URL",
+  },
+  {
     text: "Capturing website screenshot",
   },
   {

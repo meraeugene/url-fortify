@@ -1,36 +1,34 @@
 import { Schema, model, models, Document } from "mongoose";
 
-export interface URLScanRecordType extends Document {
+export interface IURLScanRecord extends Document {
   userId: string;
+  maxLookupsUsed: number;
   lastURLScanDate: Date;
-  totalURLScans: number;
-  URLScanLimitPerMonth: number;
+  maxLookups: number;
 }
 
-const URLScanRecordSchema = new Schema<URLScanRecordType>({
+const URLScanRecordSchema = new Schema<IURLScanRecord>({
   userId: {
     type: String,
     required: true,
   },
-  totalURLScans: {
+  maxLookups: {
+    type: Number,
+    required: true,
+    default: 5,
+  },
+  maxLookupsUsed: {
     type: Number,
     required: true,
     default: 0,
   },
   lastURLScanDate: {
     type: Date,
-    required: true,
-    default: Date.now,
-  },
-  URLScanLimitPerMonth: {
-    type: Number,
-    required: true,
-    default: 5,
   },
 });
 
 const URLScanRecord =
   models?.URLScanRecord ||
-  model<URLScanRecordType>("URLScanRecord", URLScanRecordSchema);
+  model<IURLScanRecord>("URLScanRecord", URLScanRecordSchema);
 
 export default URLScanRecord;

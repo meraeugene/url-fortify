@@ -1,7 +1,7 @@
 "use client";
 
 import { FiEdit2 } from "react-icons/fi";
-import { IoDiamondOutline, IoCloseOutline, IoArrowBack } from "react-icons/io5";
+import { IoDiamondOutline, IoArrowBack } from "react-icons/io5";
 import {
   MdOutlinePayments,
   MdOutlineDataUsage,
@@ -11,9 +11,11 @@ import { BiSupport } from "react-icons/bi";
 import { GiVibratingShield } from "react-icons/gi";
 import Image from "next/image";
 import Link from "next/link";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { fetcher } from "@/helpers/fetcher";
+import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { RiRefundLine, RiErrorWarningLine } from "react-icons/ri";
 
 const sections = [
   {
@@ -33,13 +35,13 @@ const sections = [
       },
       {
         href: "/account/manage-your-plan",
-        label: "Manage subscriptions",
+        label: "Manage your subscription",
         icon: <GiVibratingShield />,
       },
       {
-        href: "/account/cancel",
-        label: "Cancel subscription",
-        icon: <IoCloseOutline />,
+        href: "/account/refund",
+        label: "Refund subscription",
+        icon: <RiRefundLine />,
       },
     ],
   },
@@ -66,11 +68,34 @@ const sections = [
 ];
 
 const Page = () => {
-  const { data: user, error, isLoading } = useSWR("/api/user", fetcher);
+  const [isFetching, setIsFetching] = useState(true);
+
+  const { data: user, isLoading, error } = useSWR("/api/user", fetcher);
+
+  useEffect(() => {
+    const fetchLatestData = async () => {
+      setIsFetching(true);
+      await mutate("/api/user");
+      setIsFetching(false);
+    };
+
+    fetchLatestData();
+  }, []);
 
   const array = new Array(6).fill(null);
 
-  if (isLoading)
+  if (error) {
+    return (
+      <div className=" h-screen flex flex-col items-center justify-center text-center font-bold   ">
+        <div className="border-red-500 border rounded-sm  text-red-500 py-2 px-4 text-xl flex items-center justify-center gap-2">
+          <RiErrorWarningLine />
+          <p>{error.response.data.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isFetching || isLoading)
     return (
       <div className="bg-black-100 py-8 px-4">
         <div className=" md:max-w-xl  lg:max-w-[60vw] xl:max-w-[40vw] 2xl:max-w-[35vw] md:mx-auto md:justify-center md:items-center ">
@@ -92,22 +117,26 @@ const Page = () => {
       </div>
     );
 
-  if (error) throw new Error("Error fetching user");
-
-  const subscriptionPlan = user.subscription.currentPlan.title;
+  const subscriptionPlan = user?.subscription?.currentPlan?.title;
 
   // Filter sections based on subscription plan
-  const filteredSections = sections.filter(
-    (section) =>
-      !(section.title === "Subscription" && subscriptionPlan === "Free Plan")
-  );
+  const filteredSections = sections.map((section) => {
+    if (section.title === "Subscription") {
+      return {
+        ...section,
+        links: section.links.filter(
+          (link) =>
+            subscriptionPlan !== "Fortify Free" ||
+            link.label === "Available plans" ||
+            link.label === "Manage your subscription"
+        ),
+      };
+    }
+    return section;
+  });
 
   return (
-    <div
-      className={`${
-        subscriptionPlan === "Free Plan" ? "h-screen" : "h-full"
-      } bg-black-100 py-8 px-4 lg:py-10`}
-    >
+    <div className=" bg-black-100 py-8 px-4 lg:py-10 h-full">
       <div className="md:max-w-xl lg:max-w-[60vw] xl:max-w-[40vw] 2xl:max-w-[35vw] mx-auto">
         <div className="mb-8 flex flex-col gap-4">
           <Link
@@ -119,7 +148,7 @@ const Page = () => {
           <h1 className="font-bold text-2xl">Account Overview</h1>
         </div>
 
-        <div className="flex bg-black-200 items-center justify-between text-white rounded-md p-4 border-slate-800 border w-full">
+        <div className="flex bg-black-200 items-center justify-between text-white rounded-md p-4 border-slate-800 pr-0 border w-full">
           <div className="flex flex-col gap-2">
             <h2 className="font-semibold">Your plan</h2>
             <h1 className="font-bold text-2xl text-[#00ED82]">

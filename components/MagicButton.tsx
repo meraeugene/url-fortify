@@ -23,6 +23,10 @@ const MagicButton = ({
   disabled?: boolean;
   htmlFor?: string;
 }) => {
+  const disabledClasses =
+    disabled &&
+    "cursor-not-allowed bg-slate-950 text-green-400 font-semibold  ";
+
   return htmlFor ? (
     <label
       htmlFor={htmlFor}
@@ -39,12 +43,13 @@ const MagicButton = ({
     </label>
   ) : (
     <button
-      className={`relative inline-flex h-12 w-full overflow-hidden p-[1px] focus:outline-none ${otherClasses}`}
+      className={` ${disabledClasses} relative inline-flex h-12 w-full overflow-hidden p-[1px] focus:outline-none ${otherClasses}`}
       disabled={disabled}
     >
       <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#00ED82_0%,#393BB2_50%,#00ED82_100%)]" />
+
       <span
-        className={`inline-flex h-full w-full items-center justify-center bg-slate-950 px-7 text-sm font-medium text-white backdrop-blur-3xl gap-2`}
+        className={`${disabledClasses} inline-flex h-full w-full items-center justify-center bg-slate-950 px-7 text-sm   backdrop-blur-3xl gap-2`}
       >
         {position === "left" && icon}
         {title}
