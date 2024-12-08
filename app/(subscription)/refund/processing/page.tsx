@@ -13,8 +13,8 @@ const Page = () => {
       // Simulate processing with a delay (e.g., 3 seconds)
       const timer = setTimeout(() => {
         // Redirect to success page with invoiceNumber
-        router.push(`/subscription/success/${params.invoiceNumber}`);
-      }, 8000); // Adjust the delay as needed
+        router.push("/account/overview");
+      }, 5000); // Adjust the delay as needed
 
       // Cleanup timer when the component is unmounted
       return () => clearTimeout(timer);
@@ -24,8 +24,8 @@ const Page = () => {
   return (
     <div className="flex items-center justify-center h-screen text-center overflow-hidden">
       <div>
-        <h1>Processing Your Payment...</h1>
-        <p>Please wait while we confirm your payment.</p>
+        <h1>Processing Your Refund...</h1>
+        <p>Please wait while we are confirming your refund.</p>
       </div>
     </div>
   );
