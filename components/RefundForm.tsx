@@ -86,7 +86,7 @@ export function RefundForm() {
 
       document.body.style.overflow = "auto";
 
-      // router.push(responseData.redirect_url);
+      router.push(responseData.redirect_url);
     } catch (error: any) {
       toast({
         title: "Error processing refund",

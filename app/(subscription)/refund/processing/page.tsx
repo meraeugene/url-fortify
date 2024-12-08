@@ -22,7 +22,7 @@ const Page = () => {
   }, [params.invoiceNumber, router]); // Dependency array ensures the effect is re-run when invoiceNumber changes
 
   return (
-    <div className="flex items-center justify-center h-screen text-center overflow-hidden">
+    <div className="flex items-center justify-center flex-col gap-2 h-screen text-center ">
       <div>
         <h1>Processing Your Refund...</h1>
         <p>Please wait while we are confirming your refund.</p>
