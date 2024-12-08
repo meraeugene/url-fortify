@@ -6,21 +6,9 @@ import OrderHistoryTable from "@/components/OrderHistoryTable";
 import useSWR from "swr";
 import { fetcher } from "@/helpers/fetcher";
 import MiniLoader from "@/components/MiniLoader";
-import { RiErrorWarningLine } from "react-icons/ri";
 
 const Page = () => {
-  const { data, error, isLoading } = useSWR("/api/user/order-history", fetcher);
-
-  if (error) {
-    return (
-      <div className=" h-screen flex flex-col items-center justify-center text-center font-medium   ">
-        <div className="border-red-500 border rounded-sm  text-red-500 py-2 px-4 text-xl flex items-center justify-center gap-2">
-          <RiErrorWarningLine />
-          <p>{error.response.data.message}</p>
-        </div>
-      </div>
-    );
-  }
+  const { data, isLoading } = useSWR("/api/user/order-history", fetcher);
 
   if (isLoading) return <MiniLoader />;
 

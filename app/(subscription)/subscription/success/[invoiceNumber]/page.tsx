@@ -21,7 +21,7 @@ const Page = () => {
   const params = useParams<{ invoiceNumber: string }>();
 
   const { toast } = useToast();
-  const [isFetching, setIsFetching] = useState(true);
+  // const [isFetching, setIsFetching] = useState(true);
 
   // Fetch the payment details based on the invoiceNumber
   const { data, isLoading } = useSWR(
@@ -29,20 +29,24 @@ const Page = () => {
     fetcher,
     {
       revalidateIfStale: true,
+      refreshInterval: 1000,
+      revalidateOnFocus: true,
+      revalidateOnMount: true,
     }
   );
 
-  useEffect(() => {
-    const fetchLatestData = async () => {
-      setIsFetching(true);
-      await mutate(`/api/user/payment/?invoiceNumber=${params.invoiceNumber}`);
-      setIsFetching(false);
-    };
+  // useEffect(() => {
+  //   const fetchLatestData = async () => {
+  //     setIsFetching(true);
+  //     await mutate(`/api/user/payment/?invoiceNumber=${params.invoiceNumber}`);
+  //     setIsFetching(false);
+  //   };
 
-    fetchLatestData();
-  }, [params.invoiceNumber]);
+  //   fetchLatestData();
+  // }, [params.invoiceNumber]);
 
-  if (isFetching || isLoading) return <MiniLoader />;
+  // if (isFetching || isLoading) return <MiniLoader />;
+  if (isLoading) return <MiniLoader />;
 
   const { invoiceNumber, paidAt, paymentMethod, amount } = data || {};
   const { features, title } = data?.plan || {};
