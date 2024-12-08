@@ -70,7 +70,7 @@ const sections = [
 const Page = () => {
   const [isFetching, setIsFetching] = useState(true);
 
-  const { data: user, isLoading, error } = useSWR("/api/user", fetcher);
+  const { data: user, isLoading } = useSWR("/api/user", fetcher);
 
   useEffect(() => {
     const fetchLatestData = async () => {
@@ -83,17 +83,6 @@ const Page = () => {
   }, []);
 
   const array = new Array(6).fill(null);
-
-  if (error) {
-    return (
-      <div className=" h-screen flex flex-col items-center justify-center text-center font-bold   ">
-        <div className="border-red-500 border rounded-sm  text-red-500 py-2 px-4 text-xl flex items-center justify-center gap-2">
-          <RiErrorWarningLine />
-          <p>{error.response.data.message}</p>
-        </div>
-      </div>
-    );
-  }
 
   if (isFetching || isLoading)
     return (

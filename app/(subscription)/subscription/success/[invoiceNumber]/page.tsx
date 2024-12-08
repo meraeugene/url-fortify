@@ -22,6 +22,7 @@ const Page = () => {
 
   const { toast } = useToast();
   const [isFetching, setIsFetching] = useState(true);
+  const [showContent, setShowContent] = useState(false); // State to control the display
 
   // Fetch the payment details based on the invoiceNumber
   const { data, error, isLoading } = useSWR(
@@ -31,6 +32,16 @@ const Page = () => {
       revalidateIfStale: true,
     }
   );
+
+  useEffect(() => {
+    // Simulate delay before showing the actual content
+    const timer = setTimeout(() => {
+      setShowContent(true); // Show content after 10 seconds
+    }, 10000);
+
+    // Cleanup the timeout on component unmount
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const fetchLatestData = async () => {
@@ -66,6 +77,18 @@ const Page = () => {
       title: "Copied",
     });
   };
+
+  // Render the "Processing" message before showing the content
+  if (!showContent) {
+    return (
+      <div className="flex items-center justify-center h-screen text-center">
+        <div>
+          <h1>Processing Your Payment...</h1>
+          <p>Please wait while we confirm your payment.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-8 pb-20 md:max-w-[70vw] md:py-12 lg:max-w-[60vw] xl:max-w-[40vw] 2xl:max-w-[30vw] mx-auto px-6  text-white">

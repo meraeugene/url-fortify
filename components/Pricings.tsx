@@ -11,6 +11,7 @@ import { AuthenticatedUserData } from "@/types";
 import { convertToSubcurrency } from "@/helpers/convertToSubcurrency";
 import { useRouter } from "next/navigation";
 import { BiSupport } from "react-icons/bi";
+import { generateUUIDInvoiceNumber } from "@/helpers/generateUUIDInvoiceNumber";
 
 type PricingsProps = {
   isAuth: boolean;
@@ -57,6 +58,7 @@ const Pricings = ({ isAuth, authenticatedUserData }: PricingsProps) => {
         userId: user._id,
         email: user.email,
         fullName: user.fullName,
+        invoiceNumber: generateUUIDInvoiceNumber(),
       };
 
       const response = await fetch("/api/checkout", {

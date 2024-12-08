@@ -54,8 +54,7 @@ export const createCheckoutSession = async ({
             ],
             payment_method_types: ["gcash", "grab_pay", "paymaya"],
             // success_url: `http://localhost:3000/subscription/success/${invoiceNumber}`,
-            success_url:
-              "https://url-fortify.vercel.app/subscription/success/${invoiceNumber}",
+            success_url: `https://url-fortify.vercel.app/subscription/success/${invoiceNumber}`,
             description: `${name} / ${description}`,
             metadata: {
               plan_id: planId,
