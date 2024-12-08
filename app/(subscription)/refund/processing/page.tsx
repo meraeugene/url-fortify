@@ -2,24 +2,20 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
 
 const Page = () => {
   const router = useRouter();
-  const params = useParams<{ invoiceNumber: string }>();
 
   useEffect(() => {
-    if (params.invoiceNumber) {
-      // Simulate processing with a delay (e.g., 3 seconds)
-      const timer = setTimeout(() => {
-        // Redirect to success page with invoiceNumber
-        router.push("/account/overview");
-      }, 5000); // Adjust the delay as needed
+    // Simulate processing with a delay (e.g., 3 seconds)
+    const timer = setTimeout(() => {
+      // Redirect to success page with invoiceNumber
+      router.push("/account/overview");
+    }, 5000); // Adjust the delay as needed
 
-      // Cleanup timer when the component is unmounted
-      return () => clearTimeout(timer);
-    }
-  }, [params.invoiceNumber, router]); // Dependency array ensures the effect is re-run when invoiceNumber changes
+    // Cleanup timer when the component is unmounted
+    return () => clearTimeout(timer);
+  }, [router]); // Dependency array ensures the effect is re-run when invoiceNumber changes
 
   return (
     <div className="flex items-center justify-center flex-col gap-2 h-screen text-center ">
