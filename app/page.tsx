@@ -2,7 +2,7 @@ import { navItems } from "@/data";
 import Hero from "@/components/Hero";
 import Footer from "@/components/Footer";
 import Clients from "@/components/Clients";
-import Pricings from "@/components/Pricings";
+import SubscriptionPlans from "@/components/SubscriptionPlans";
 import { FloatingNav } from "@/components/ui/FloatingNavbar";
 import { getUser, verifySession } from "@/lib/dal";
 
@@ -26,7 +26,7 @@ const Home = async () => {
           authenticatedUserData={parsedAuthenticatedUserData}
         />
         <Hero authenticatedUserData={parsedAuthenticatedUserData} />
-        <Pricings
+        <SubscriptionPlans
           isAuth={isAuth}
           authenticatedUserData={parsedAuthenticatedUserData}
         />

@@ -18,9 +18,16 @@ export const testimonials = [
     title: "Software Engineer",
     profile: "/fiel.jpg",
   },
+  {
+    quote:
+      "Thank you for this website because it helps me to feel more secure.",
+    name: "Ervi Jude Arcillas",
+    title: "CEO",
+    profile: "/erb.png",
+  },
 ];
 
-export const pricingPlans = [
+export const subscriptionPlans = [
   {
     id: 1,
     title: "Free Plan",

@@ -32,7 +32,7 @@ const Footer = () => {
           </span>{" "}
           can protect your digital assets from phishing threats.
         </p>
-        <a href="mailto:support@phishtrap.io">
+        <a href="mailto:supporturlfortify@gmail.com">
           <MagicButton
             title="Contact Us"
             icon={<FaLocationArrow />}

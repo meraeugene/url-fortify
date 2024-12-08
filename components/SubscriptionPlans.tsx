@@ -12,13 +12,17 @@ import { convertToSubcurrency } from "@/helpers/convertToSubcurrency";
 import { useRouter } from "next/navigation";
 import { BiSupport } from "react-icons/bi";
 import { generateUUIDInvoiceNumber } from "@/helpers/generateUUIDInvoiceNumber";
+import SubscriptionLoader from "./SubscriptionLoader";
 
 type PricingsProps = {
   isAuth: boolean;
   authenticatedUserData: AuthenticatedUserData;
 };
 
-const Pricings = ({ isAuth, authenticatedUserData }: PricingsProps) => {
+const SubscriptionPlans = ({
+  isAuth,
+  authenticatedUserData,
+}: PricingsProps) => {
   const { toast } = useToast();
   const router = useRouter();
 
@@ -34,7 +38,7 @@ const Pricings = ({ isAuth, authenticatedUserData }: PricingsProps) => {
 
   const user = authenticatedUserData || {};
 
-  if (isLoading) return <MiniLoader />;
+  if (isLoading) return <SubscriptionLoader />;
 
   const handleCheckoutSubscription = async (plan: Plan) => {
     if (!isAuth) {
@@ -224,4 +228,4 @@ const Pricings = ({ isAuth, authenticatedUserData }: PricingsProps) => {
   );
 };
 
-export default Pricings;
+export default SubscriptionPlans;
