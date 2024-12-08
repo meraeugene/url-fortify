@@ -15,7 +15,7 @@ import useSWR, { mutate } from "swr";
 import { fetcher } from "@/helpers/fetcher";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { RiRefundLine, RiErrorWarningLine } from "react-icons/ri";
+import { RiRefundLine } from "react-icons/ri";
 
 const sections = [
   {
@@ -68,23 +68,25 @@ const sections = [
 ];
 
 const Page = () => {
-  const [isFetching, setIsFetching] = useState(true);
+  // const [isFetching, setIsFetching] = useState(true);
 
-  const { data: user, isLoading } = useSWR("/api/user", fetcher);
+  const { data: user, isLoading } = useSWR("/api/user", fetcher, {
+    revalidateIfStale: true,
+  });
 
-  useEffect(() => {
-    const fetchLatestData = async () => {
-      setIsFetching(true);
-      await mutate("/api/user");
-      setIsFetching(false);
-    };
+  // useEffect(() => {
+  //   const fetchLatestData = async () => {
+  //     setIsFetching(true);
+  //     await mutate("/api/user");
+  //     setIsFetching(false);
+  //   };
 
-    fetchLatestData();
-  }, []);
+  //   fetchLatestData();
+  // }, []);
 
   const array = new Array(6).fill(null);
 
-  if (isFetching || isLoading)
+  if (isLoading)
     return (
       <div className="bg-black-100 py-8 px-4">
         <div className=" md:max-w-xl  lg:max-w-[60vw] xl:max-w-[40vw] 2xl:max-w-[35vw] md:mx-auto md:justify-center md:items-center ">

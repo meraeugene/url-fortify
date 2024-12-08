@@ -15,7 +15,6 @@ import { IoLockClosedSharp } from "react-icons/io5";
 import { useToast } from "@/hooks/useToast";
 import { formatPrice } from "@/helpers/formatPrice";
 import { useParams } from "next/navigation";
-import { RiErrorWarningLine } from "react-icons/ri";
 
 const Page = () => {
   const params = useParams<{ invoiceNumber: string }>();
@@ -25,7 +24,7 @@ const Page = () => {
   const [showContent, setShowContent] = useState(false); // State to control the display
 
   // Fetch the payment details based on the invoiceNumber
-  const { data, error, isLoading } = useSWR(
+  const { data, isLoading } = useSWR(
     `/api/user/payment/?invoiceNumber=${params.invoiceNumber}`, // API request using the invoiceNumber
     fetcher,
     {
@@ -37,7 +36,7 @@ const Page = () => {
     // Simulate delay before showing the actual content
     const timer = setTimeout(() => {
       setShowContent(true); // Show content after 10 seconds
-    }, 10000);
+    }, 8000);
 
     // Cleanup the timeout on component unmount
     return () => clearTimeout(timer);
@@ -54,17 +53,6 @@ const Page = () => {
   }, [params.invoiceNumber]);
 
   if (isFetching || isLoading) return <MiniLoader />;
-
-  if (error) {
-    return (
-      <div className=" h-screen flex flex-col items-center justify-center text-center  font-medium   ">
-        <div className="border-red-500 border rounded-sm  text-red-500 py-2 px-4 text-xl flex items-center justify-center gap-2">
-          <RiErrorWarningLine />
-          <p>{error.response.data.message}</p>
-        </div>
-      </div>
-    );
-  }
 
   const { invoiceNumber, paidAt, paymentMethod, amount } = data || {};
   const { features, title } = data?.plan || {};
