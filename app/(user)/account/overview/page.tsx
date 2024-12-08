@@ -73,7 +73,6 @@ const Page = () => {
   const { data: user, isLoading } = useSWR("/api/user", fetcher, {
     revalidateIfStale: true,
     revalidateOnFocus: true,
-    revalidateOnMount: true,
   });
 
   // useEffect(() => {

@@ -25,13 +25,11 @@ const Page = () => {
 
   // Fetch the payment details based on the invoiceNumber
   const { data, isLoading } = useSWR(
-    `/api/user/payment/?invoiceNumber=${params.invoiceNumber}`, // API request using the invoiceNumber
+    `/api/user/payment/?invoiceNumber=${params.invoiceNumber}`,
     fetcher,
     {
       revalidateIfStale: true,
-      refreshInterval: 1000,
       revalidateOnFocus: true,
-      revalidateOnMount: true,
     }
   );
 
