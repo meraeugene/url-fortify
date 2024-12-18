@@ -13,7 +13,6 @@ export const POST = async (request: Request) => {
     return new NextResponse(
       JSON.stringify({
         message: "Login successful",
-        redirectURL: "/",
       }),
       { status: 200 }
     );

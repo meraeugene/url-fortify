@@ -114,9 +114,7 @@ export const FloatingNav = ({
         throw new Error(errorMessage);
       }
 
-      // // Successfully logged in
-      const data = await response.json();
-      router.push(data.redirectURL);
+      router.refresh();
     } catch (error: any) {
       console.log(error);
       toast({
@@ -130,6 +128,8 @@ export const FloatingNav = ({
 
   const handleLogout = async () => {
     try {
+      setLoading(true);
+
       const response = await fetch("/api/auth/logout", {
         method: "POST",
         headers: {
@@ -143,16 +143,15 @@ export const FloatingNav = ({
         throw new Error(errorMessage);
       }
 
-      // // Successfully logged out
-      const data = await response.json();
-
-      router.push(data.redirectURL);
+      router.refresh();
     } catch (error: any) {
       console.log(error);
       toast({
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -203,13 +202,22 @@ export const FloatingNav = ({
           <>
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <Image
-                  src={user?.image || "/profile.jpg"}
-                  width={28}
-                  height={28}
-                  className="rounded-full object-cover aspect-square"
-                  alt="profile picture"
-                />
+                {loading ? (
+                  <Image
+                    src="/loader.svg"
+                    width={30}
+                    height={30}
+                    alt="loader"
+                  />
+                ) : (
+                  <Image
+                    src={user?.image || "/profile.jpg"}
+                    width={28}
+                    height={28}
+                    className="rounded-full object-cover aspect-square"
+                    alt="profile picture"
+                  />
+                )}
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem>

@@ -13,7 +13,6 @@ import Image from "next/image";
 import Link from "next/link";
 import useSWR, { mutate } from "swr";
 import { fetcher } from "@/helpers/fetcher";
-import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { RiRefundLine } from "react-icons/ri";
 
