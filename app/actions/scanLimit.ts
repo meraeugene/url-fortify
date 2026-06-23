@@ -1,8 +1,8 @@
-import SubscriptionPlan from "@/lib/models/subscriptionPlanModel";
 import URLScanRecord, { IURLScanRecord } from "@/lib/models/urlScanRecordModel";
 import User from "@/lib/models/userModel";
 import { GuestSession, Session } from "@/types";
 import { NextResponse } from "next/server";
+import { getFreePlan, getPlanById } from "@/lib/subscriptionPlans";
 
 // Helper function to handle the guest user scan limit
 export const handleGuestUserScanLimit = async (
@@ -67,10 +67,7 @@ export const handleGuestUserScanLimit = async (
 // Helper function to handle the authenticated user scan limit
 export const handleAuthenticatedUserScanLimit = async (session: Session) => {
   // Fetch the user from the database using the userId from the session
-  let user = await User.findById(session.userId).populate({
-    path: "subscription.currentPlan",
-    model: SubscriptionPlan,
-  });
+  let user = await User.findById(session.userId);
 
   // If the user does not exist, return a 404 response with an appropriate error message
   if (!user) {
@@ -96,13 +93,15 @@ export const handleAuthenticatedUserScanLimit = async (session: Session) => {
   // Check if the user has a subscription and a valid current plan
   if (user.subscription && user.subscription.currentPlan) {
     const { maxLookupsUsed } = user.usageStats;
-    const { maxLookups } = user.subscription.currentPlan;
+    const currentPlan =
+      getPlanById(user.subscription.currentPlan) || getFreePlan();
+    const { maxLookups } = currentPlan;
 
     // If the user has exceeded their maxLookups, return an error response
     // Greater than or equal because it starts from 0 maxLookups  used by user
     if (maxLookupsUsed >= maxLookups) {
-      const planName = user.subscription.currentPlan.title;
-      const maxLookups = user.subscription.currentPlan.maxLookups;
+      const planName = currentPlan.title;
+      const maxLookups = currentPlan.maxLookups;
 
       return new NextResponse(
         JSON.stringify({

@@ -1,8 +1,8 @@
 import { connect } from "@/lib/db";
-import SubscriptionPlan from "@/lib/models/subscriptionPlanModel";
 import User from "@/lib/models/userModel";
 import Payment from "@/lib/models/paymentModel";
 import { NextResponse } from "next/server";
+import { FREE_PLAN_ID } from "@/lib/subscriptionPlans";
 
 export const refundUserSubscription = async (
   userId: string,
@@ -26,15 +26,6 @@ export const refundUserSubscription = async (
       });
     }
 
-    // Find the free plan
-    const freePlan = await SubscriptionPlan.findOne({ title: "Fortify Free" });
-    if (!freePlan) {
-      return new NextResponse(
-        JSON.stringify({ message: "Free plan not found." }),
-        { status: 404 }
-      );
-    }
-
     // Find the payment using the paymentId from PayMongo
     const updatedPayment = await Payment.findByIdAndUpdate(
       paymentMongoId, // Querying by the custom paymentId from PayMongo
@@ -54,7 +45,7 @@ export const refundUserSubscription = async (
     const updatedUserSubscriptionPlan = await User.findByIdAndUpdate(
       userId,
       {
-        "subscription.currentPlan": freePlan,
+        "subscription.currentPlan": FREE_PLAN_ID,
       },
       { new: true }
     );

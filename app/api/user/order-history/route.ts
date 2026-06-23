@@ -2,7 +2,7 @@ import Payment from "@/lib/models/paymentModel";
 import { connect } from "@/lib/db";
 import { verifySession } from "@/lib/dal";
 import { NextResponse } from "next/server";
-import SubscriptionPlan from "@/lib/models/subscriptionPlanModel";
+import { getPlanById, getPlanByPaymentAmount } from "@/lib/subscriptionPlans";
 
 export const GET = async () => {
   try {
@@ -20,11 +20,7 @@ export const GET = async () => {
     const payments = await Payment.find({ userId: session.userId })
       .sort({ paidAt: -1 }) // Sort by most recent payment
       .select("invoiceNumber paymentMethod paidAt amount plan  status  ") // Choose which fields to return
-      .populate({
-        path: "plan",
-        model: SubscriptionPlan,
-        select: "title",
-      })
+      .lean()
       .exec();
 
     // If no payments found, return an empty array
@@ -42,7 +38,11 @@ export const GET = async () => {
     return new NextResponse(
       JSON.stringify({
         message: "Payment history retrieved successfully.",
-        payments,
+        payments: payments.map((payment) => ({
+          ...payment,
+          plan:
+            getPlanById(payment.plan) || getPlanByPaymentAmount(payment.amount),
+        })),
       }),
       { status: 200 }
     );

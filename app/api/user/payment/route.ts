@@ -1,8 +1,7 @@
 import { connect } from "@/lib/db";
 import Payment from "@/lib/models/paymentModel"; // Import the Payment model
 import { NextResponse } from "next/server";
-import { verifySession } from "@/lib/dal";
-import SubscriptionPlan from "@/lib/models/subscriptionPlanModel";
+import { getPlanById, getPlanByPaymentAmount } from "@/lib/subscriptionPlans";
 
 export const GET = async (req: Request) => {
   try {
@@ -19,14 +18,12 @@ export const GET = async (req: Request) => {
       );
     }
 
+    await connect();
+
     // Find the latest payment for the user, sorted by paidAt in descending order (latest first)
-    const latestPayment = await Payment.findOne({
+    const latestPayment = (await Payment.findOne({
       invoiceNumber,
-    }).populate({
-      path: "plan",
-      model: SubscriptionPlan,
-      select: "title features",
-    });
+    }).lean()) as any;
 
     if (!latestPayment) {
       return new NextResponse(
@@ -38,7 +35,15 @@ export const GET = async (req: Request) => {
     }
 
     // Return the latest payment information
-    return new NextResponse(JSON.stringify(latestPayment), { status: 200 });
+    return new NextResponse(
+      JSON.stringify({
+        ...latestPayment,
+        plan:
+          getPlanById(latestPayment.plan) ||
+          getPlanByPaymentAmount(latestPayment.amount),
+      }),
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error("Error querying latest payment:", error);
     return new NextResponse(

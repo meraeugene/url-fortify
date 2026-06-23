@@ -6,7 +6,11 @@ import { cache } from "react";
 import User from "@/lib/models/userModel";
 import { connect } from "@/lib/db";
 import Payment from "@/lib/models/paymentModel";
-import SubscriptionPlan from "@/lib/models/subscriptionPlanModel";
+import {
+  getFreePlan,
+  getPlanById,
+  getPlanByPaymentAmount,
+} from "@/lib/subscriptionPlans";
 
 export const verifySession = cache(async () => {
   // Retrieve the 'session' cookie from the request headers
@@ -63,27 +67,37 @@ export const getUser = cache(async () => {
     // Establish database connection
     await connect();
 
-    // Fetch user from the database and populate their subscription plan
-    const user = await User.findById(session.userId)
-      .populate({
-        path: "subscription.currentPlan",
-        model: SubscriptionPlan,
-        select: "title features maxLookups", // Only select specific fields, e.g., title and price
-      })
+    // Fetch user from the database and hydrate the static subscription plan.
+    const user = (await User.findById(session.userId)
       .populate({
         path: "payments", // Populate payments array
         select: "amount status paidAt paymentId invoiceNumber paymentMethod", // Select the fields you need from Payment
         model: Payment,
         options: { sort: { paidAt: -1 }, limit: 1 }, // Sort and limit to the latest payment
       })
-      .exec();
+      .lean()
+      .exec()) as any;
 
     if (!user) {
       // Return null if no user found
       return null;
     }
 
-    return user;
+    const latestPaidPayment = user.payments?.find(
+      (payment: any) => payment.status === "paid"
+    );
+    const currentPlan =
+      getPlanById(user.subscription?.currentPlan) ||
+      getPlanByPaymentAmount(latestPaidPayment?.amount) ||
+      getFreePlan();
+
+    return {
+      ...user,
+      subscription: {
+        ...user.subscription,
+        currentPlan,
+      },
+    };
   } catch (error: any) {
     // Log the error to identify issues
     console.log("Failed to fetch user:", error.message);

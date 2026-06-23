@@ -2,7 +2,7 @@ import { createSession, deleteSession } from "@/lib/session";
 import { connect } from "@/lib/db";
 import User from "@/lib/models/userModel";
 import { UserData } from "@/types";
-import SubscriptionPlan from "@/lib/models/subscriptionPlanModel";
+import { FREE_PLAN_ID } from "@/lib/subscriptionPlans";
 
 export const login = async (userData: UserData) => {
   const { fullName, email, image } = userData;
@@ -16,14 +16,6 @@ export const login = async (userData: UserData) => {
   // Connect to the database
   await connect();
 
-  // Try to find the 'Fortify Free' from the PricingPlan collection
-  const freePlan = await SubscriptionPlan.findOne({ title: "Fortify Free" });
-
-  // If the 'Fortify Free' doesn't exist, throw an error
-  if (!freePlan) {
-    throw new Error("Fortify Free not found.");
-  }
-
   // Search for an existing user by email
   let user = await User.findOne({ email });
 
@@ -34,7 +26,7 @@ export const login = async (userData: UserData) => {
       email,
       image,
       subscription: {
-        currentPlan: freePlan._id,
+        currentPlan: FREE_PLAN_ID,
         status: "active",
       },
     });

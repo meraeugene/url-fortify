@@ -105,7 +105,7 @@ export interface CurrentPlan {
 
 export interface PlanFeature {
   name: string;
-  value: number | boolean; // Some features have numeric values; others are boolean
+  value: string | number | boolean; // Some features have numeric values; others are labels
   _id: string; // MongoDB ObjectId as a string
 }
 
@@ -137,7 +137,7 @@ export interface AuthenticatedUserData {
 }
 
 export interface Plan {
-  _id: number;
+  _id: string;
   offer: string;
   price: number;
   title: string;
